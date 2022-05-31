@@ -68,7 +68,7 @@ public class FilmController {
 
         //Если в таблице находится фильм с таким id, то извлекаем данный id, иначе присваиваем текущий id
         long id = filmToBeUpdated.map(Film::getId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
         film.setId(id);
         films.put(id, film);
         log.info("Фильм с названием {} был обновлен", film.getName());

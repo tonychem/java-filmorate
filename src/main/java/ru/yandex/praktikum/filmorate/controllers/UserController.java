@@ -66,7 +66,7 @@ public class UserController {
                 .findAny();
         //Если в таблице находится пользователь с таким id, то извлекаем данный id, иначе бросаем NOT_FOUND
         long id = userToBeUpdated.map(User::getId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
         user.setId(id);
         users.put(id, user);
         log.info("Информация о пользователе {} была обновлена", user.getLogin());
