@@ -9,6 +9,7 @@ import ru.yandex.praktikum.filmorate.validation.ValidationException;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,8 +28,8 @@ public class UserController {
     }
 
     @GetMapping
-    public Map<Long, User> getUsers() {
-        return users;
+    public Collection<User> getUsers() {
+        return users.values();
     }
 
     @PostMapping
@@ -59,14 +60,13 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        // Считаем, что обновляемый и новый юзер должны иметь хотя бы одинаковый email
+        // Проверяем, есть ли в таблице пользователь с таким же id
         Optional<User> userToBeUpdated = users.values().stream()
-                .filter(x -> x.getEmail().equals(user.getEmail()))
+                .filter(x -> x.getId() == user.getId())
                 .findAny();
-        //Если в таблице находится пользователь с таким id, то извлекаем данный id, иначе присваиваем текущий id
-        long id = userToBeUpdated.map(User::getId).orElseGet(() -> currentId++);
-
-        //устанавливаем id пользователя и его имя, если оно пусто
+        //Если в таблице находится пользователь с таким id, то извлекаем данный id, иначе бросаем NOT_FOUND
+        long id = userToBeUpdated.map(User::getId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         user.setId(id);
         users.put(id, user);
         log.info("Информация о пользователе {} была обновлена", user.getLogin());

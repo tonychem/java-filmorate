@@ -9,6 +9,7 @@ import ru.yandex.praktikum.filmorate.validation.ValidationException;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,8 +29,8 @@ public class FilmController {
     }
 
     @GetMapping
-    public Map<Long, Film> getFilms() {
-        return films;
+    public Collection<Film> getFilms() {
+        return films.values();
     }
 
     @PostMapping
@@ -62,10 +63,12 @@ public class FilmController {
         }
 
         Optional<Film> filmToBeUpdated = films.values().stream()
-                .filter(x -> x.getName().equals(film.getName()))
+                .filter(x -> x.getId() == film.getId())
                 .findAny();
+
         //Если в таблице находится фильм с таким id, то извлекаем данный id, иначе присваиваем текущий id
-        long id = filmToBeUpdated.map(Film::getId).orElseGet(() -> currentId++);
+        long id = filmToBeUpdated.map(Film::getId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         film.setId(id);
         films.put(id, film);
         log.info("Фильм с названием {} был обновлен", film.getName());
