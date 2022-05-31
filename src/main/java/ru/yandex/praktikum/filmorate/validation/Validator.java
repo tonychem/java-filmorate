@@ -11,9 +11,11 @@ public class Validator {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final LocalDate FILM_RELEASE_DATE_LOWER_BOUND = LocalDate.of(1895, 12, 28);
+
+    private static final int MAX_DESCRIPTION_LENGTH = 200;
     public boolean validateRequestBody(Film film) {
         LocalDate actualReleaseDate = LocalDate.parse(film.getReleaseDate(), FORMATTER);
-        boolean isValid = !(film.getName().isEmpty()) && (film.getDescription().length() <= 200)
+        boolean isValid = !(film.getName().isEmpty()) && (film.getDescription().length() <= MAX_DESCRIPTION_LENGTH)
                 && (actualReleaseDate.isAfter(FILM_RELEASE_DATE_LOWER_BOUND)) && (film.getDuration() > 0);
 
         if (isValid) {
