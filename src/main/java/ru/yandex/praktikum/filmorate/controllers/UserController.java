@@ -5,31 +5,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.praktikum.filmorate.model.User;
+import ru.yandex.praktikum.filmorate.storage.UserStorage;
 import ru.yandex.praktikum.filmorate.validation.ValidationException;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @Slf4j
 @RequestMapping(value = "/users")
 public class UserController {
-    private Map<Long, User> users = new HashMap<>();
     private final Validator validator;
+    private final UserStorage userStorage;
 
-    private long currentId = 1;
-
-    public UserController(Validator validator) {
+    public UserController(Validator validator, UserStorage userStorage) {
         this.validator = validator;
+        this.userStorage = userStorage;
     }
 
     @GetMapping
     public Collection<User> getUsers() {
-        return users.values();
+        return userStorage.users();
     }
 
     @PostMapping
@@ -41,14 +38,10 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        // Приходящему пользователю устанавливается id
-        user.setId(currentId);
+        User userIdUpdated = userStorage.addUser(user);
+        log.info("Пользователь {} был добавлен", userIdUpdated.getLogin());
 
-        users.put(user.getId(), user);
-        currentId++;
-        log.info("Пользователь {} был добавлен", user.getLogin());
-
-        return user;
+        return userIdUpdated;
     }
 
     @PutMapping
@@ -60,17 +53,13 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        // Проверяем, есть ли в таблице пользователь с таким же id
-        Optional<User> userToBeUpdated = users.values().stream()
-                .filter(x -> x.getId() == user.getId())
-                .findAny();
-        //Если в таблице находится пользователь с таким id, то извлекаем данный id, иначе бросаем NOT_FOUND
-        long id = userToBeUpdated.map(User::getId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND));
-        user.setId(id);
-        users.put(id, user);
-        log.info("Информация о пользователе {} была обновлена", user.getLogin());
+        User userToBeUpdated = userStorage.updateUser(user);
 
-        return user;
+        if (userToBeUpdated != null) {
+            log.info("Информация о пользователе {} была обновлена", userToBeUpdated.getLogin());
+            return userToBeUpdated;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 }

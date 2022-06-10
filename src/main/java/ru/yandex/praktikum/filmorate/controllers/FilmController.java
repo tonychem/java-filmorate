@@ -5,32 +5,29 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.praktikum.filmorate.model.Film;
+import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 import ru.yandex.praktikum.filmorate.validation.ValidationException;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/films")
 @Slf4j
 public class FilmController {
-    private Map<Long, Film> films = new HashMap<>();
-
     private final Validator validator;
-    //Контроллер присваивает id приходящим объектам
-    private long currentId = 1;
 
-    public FilmController(Validator validator) {
+    private final FilmStorage filmStorage;
+
+    public FilmController(Validator validator, FilmStorage filmStorage) {
         this.validator = validator;
+        this.filmStorage = filmStorage;
     }
 
     @GetMapping
     public Collection<Film> getFilms() {
-        return films.values();
+        return filmStorage.films();
     }
 
     @PostMapping
@@ -43,12 +40,10 @@ public class FilmController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        film.setId(currentId);
-        films.put(currentId, film);
-        log.info("Фильм с названием {} был добавлен", film.getName());
-        currentId++;
+        Film filmIdUpdated = filmStorage.addFilm(film);
+        log.info("Фильм с названием {} был добавлен", filmIdUpdated.getName());
 
-        return film;
+        return filmIdUpdated;
     }
 
     // Посколько id назначается контроллером, считаем, что у старого и нового фильма совпадают хотя бы названия
@@ -62,18 +57,14 @@ public class FilmController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        Optional<Film> filmToBeUpdated = films.values().stream()
-                .filter(x -> x.getId() == film.getId())
-                .findAny();
+        Film filmToBeUpdated = filmStorage.updateFilm(film);
 
-        //Если в таблице находится фильм с таким id, то извлекаем данный id, иначе присваиваем текущий id
-        long id = filmToBeUpdated.map(Film::getId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND));
-        film.setId(id);
-        films.put(id, film);
-        log.info("Фильм с названием {} был обновлен", film.getName());
-
-        return film;
+        if (filmToBeUpdated != null) {
+            log.info("Фильм с названием {} был обновлен", filmToBeUpdated.getName());
+            return filmToBeUpdated;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 }
 
