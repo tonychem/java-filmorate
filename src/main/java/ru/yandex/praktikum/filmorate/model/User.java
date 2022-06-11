@@ -24,4 +24,5 @@ public class User {
 
     @NonNull
     private String birthday;
+
 }
