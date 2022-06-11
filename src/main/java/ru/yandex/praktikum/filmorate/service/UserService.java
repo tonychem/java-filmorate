@@ -17,7 +17,7 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    //Отображение Id пользователя на множество Id его друзей
+    //Отображение Id пользователя на множество Id его друзей\
     private final Map<Long, Set<Long>> friendMap = new HashMap<>();
 
     public void befriend(long user1Id, long user2Id) {
@@ -69,8 +69,8 @@ public class UserService {
             return Collections.emptySet();
         }
 
-        Set<Long> user1FriendList = friendMap.get(user1Id);
-        Set<Long> user2FriendList = friendMap.get(user2Id);
+        Set<Long> user1FriendList = new HashSet<>(friendMap.get(user1Id));
+        Set<Long> user2FriendList = new HashSet<>(friendMap.get(user2Id));
 
         //В user1FriendList оставляем только те элементы, которые содержаться в user2FriendList
         user1FriendList.retainAll(user2FriendList);

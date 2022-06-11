@@ -55,7 +55,7 @@ public class UserController {
                           @PathVariable @Positive long friendId) {
         userService.befriend(id, friendId);
     }
-
+    
     @DeleteMapping(value = "/{id}/friends/{friendId}")
     public void deleteFromFriendList(@PathVariable @Positive long id,
                                      @PathVariable @Positive long friendId) {
