@@ -29,13 +29,6 @@ public class GlobalExceptionHandler {
         log.warn(exc.getMessage());
         return new ResponseEntity<>(exc.getMessage(), HttpStatus.NOT_FOUND);
     }
-
-    @ExceptionHandler(value = {NoLikesException.class, FriendListEmptyException.class})
-    public ResponseEntity<String> handleEmptyStateExceptions(RuntimeException exc) {
-        log.warn(exc.getMessage());
-        return new ResponseEntity<>(exc.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(value = {FilmAlreadyExistsException.class, UserAlreadyExistsException.class})
     public ResponseEntity<String> handleEntityAlreadyExistsExceptions(RuntimeException exc) {
         log.warn(exc.getMessage());

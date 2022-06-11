@@ -1,15 +1,11 @@
 package ru.yandex.praktikum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.praktikum.filmorate.exception.FriendListEmptyException;
 import ru.yandex.praktikum.filmorate.exception.NoSuchUserException;
 import ru.yandex.praktikum.filmorate.model.User;
 import ru.yandex.praktikum.filmorate.storage.UserStorage;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,17 +21,9 @@ public class UserService {
     private final Map<Long, Set<Long>> friendMap = new HashMap<>();
 
     public void befriend(long user1Id, long user2Id) {
-        if (user1Id == user2Id) {
-            throw new IllegalStateException("Нельзя добавить самого себя в друзья");
-        }
-
-        if (userStorage.getUserById(user1Id) == null) {
-            throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", user1Id));
-        }
-
-        if (userStorage.getUserById(user2Id) == null) {
-            throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", user2Id));
-        }
+        checkUserIdentity(user1Id, user2Id);
+        checkUserExists(user1Id);
+        checkUserExists(user2Id);
 
         if (!friendMap.containsKey(user1Id)) {
             friendMap.put(user1Id, new HashSet<>());
@@ -51,15 +39,13 @@ public class UserService {
     }
 
     public void deleteFriend(long user, long friend) {
-        if (user == friend) {
-            throw new IllegalStateException("Нельзя удалить самого себя из друзей");
-        }
+        checkUserIdentity(user, friend);
 
         Set<Long> friendSet = friendMap.get(user);
         if (friendSet != null) {
             friendSet.remove(friend);
         } else {
-            checkUser(user);
+            checkUserExists(user);
         }
     }
 
@@ -70,20 +56,22 @@ public class UserService {
                     .map(userStorage::getUserById)
                     .collect(Collectors.toSet());
         } else {
-            checkUser(userId);
+            checkUserExists(userId);
         }
-        return null;
+        return Collections.emptySet();
     }
-    public Set<User> mutualFriendList(long user1, long user2) {
-        Set<Long> user1FriendList = friendMap.get(user1);
-        Set<Long> user2FriendList = friendMap.get(user2);
-        if (user1FriendList == null) {
-            throw new FriendListEmptyException(String.format("У пользователя с id = %d список друзей пуст", user1));
+
+    public Set<User> mutualFriendList(long user1Id, long user2Id) {
+        checkUserExists(user1Id);
+        checkUserExists(user2Id);
+
+        if (friendMap.get(user1Id) == null || friendMap.get(user2Id) == null) {
+            return Collections.emptySet();
         }
 
-        if (user2FriendList == null) {
-            throw new FriendListEmptyException(String.format("У пользователя с id = %d список друзей пуст", user2));
-        }
+        Set<Long> user1FriendList = friendMap.get(user1Id);
+        Set<Long> user2FriendList = friendMap.get(user2Id);
+
         //В user1FriendList оставляем только те элементы, которые содержаться в user2FriendList
         user1FriendList.retainAll(user2FriendList);
 
@@ -93,15 +81,17 @@ public class UserService {
                 .collect(Collectors.toSet());
     }
 
-    //Метод выбрасывает соответствующее исключение, если пользователь отсутствует в UserStorage
-    //или у пользователя отсутствует список друзей
-    private void checkUser(long userId) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
+    private void checkUserExists(long userId) {
+        if (userStorage.getUserById(userId) == null) {
             throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", userId));
-        } else {
-            throw new FriendListEmptyException(String.format("У пользователя %s нет друзей",
-                    user.getName()));
         }
     }
+
+    private void checkUserIdentity(long user1Id, long user2Id) {
+        if (user1Id == user2Id) {
+            throw new IllegalStateException("Нельзя совершать операции добавления в друзья " +
+                    "/ удаление из друзей над самим собой");
+        }
+    }
+
 }

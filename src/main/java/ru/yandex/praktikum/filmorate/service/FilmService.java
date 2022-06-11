@@ -1,7 +1,6 @@
 package ru.yandex.praktikum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.praktikum.filmorate.exception.NoLikesException;
 import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.exception.NoSuchUserException;
 import ru.yandex.praktikum.filmorate.model.Film;
@@ -52,7 +51,7 @@ public class FilmService {
 
     public List<Film> getMostLikedFilms(int limit) {
         // сравниваем пары значений (filmId, {userId}) по размеру множества лайков, сортируем в порядке убывания
-        List<Film> listOfMostPopularFilmsCachedInLikeMap =  filmLikeMap.entrySet().stream()
+        List<Film> listOfMostPopularFilmsCachedInLikeMap = filmLikeMap.entrySet().stream()
                 .sorted((entry1, entry2) -> (-1) * Long.compare(entry1.getValue().size(), entry2.getValue().size()))
                 .limit(limit)
                 .map(x -> filmStorage.getFilmById(x.getKey()))
@@ -79,9 +78,6 @@ public class FilmService {
         Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
             throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", filmId));
-        } else {
-            throw new NoLikesException(String.format("У фильма %s отсутствуют лайки",
-                    film.getName()));
         }
     }
 }
