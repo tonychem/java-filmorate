@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.filmorate.validation;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.praktikum.filmorate.exception.ValidationException;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.model.User;
 
@@ -21,7 +22,7 @@ public class Validator {
         if (isValid) {
             return true;
         } else {
-            throw new ValidationException("Данные объекта Film неверны.");
+            throw new ValidationException("Данные объекта Film неверны: " + film);
         }
 
     }
@@ -39,7 +40,7 @@ public class Validator {
             }
             return true;
         } else {
-            throw new ValidationException("Данные объекта User неверны.");
+            throw new ValidationException("Данные объекта User неверны: " + user);
         }
     }
 }

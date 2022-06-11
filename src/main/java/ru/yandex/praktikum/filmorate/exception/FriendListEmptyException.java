@@ -1,6 +1,4 @@
-package ru.yandex.praktikum.filmorate.service;
-
-import lombok.NonNull;
+package ru.yandex.praktikum.filmorate.exception;
 
 public class FriendListEmptyException extends RuntimeException {
     public FriendListEmptyException(String message) {

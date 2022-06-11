@@ -1,6 +1,8 @@
 package ru.yandex.praktikum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.praktikum.filmorate.exception.FriendListEmptyException;
+import ru.yandex.praktikum.filmorate.exception.NoSuchUserException;
 import ru.yandex.praktikum.filmorate.model.User;
 import ru.yandex.praktikum.filmorate.storage.UserStorage;
 
@@ -22,9 +24,18 @@ public class UserService {
     //Отображение Id пользователя на множество Id его друзей
     private final Map<Long, Set<Long>> friendMap = new HashMap<>();
 
-    public void befriend(User user1, User user2) {
-        long user1Id = user1.getId();
-        long user2Id = user2.getId();
+    public void befriend(long user1Id, long user2Id) {
+        if (user1Id == user2Id) {
+            throw new IllegalStateException("Нельзя добавить самого себя в друзья");
+        }
+
+        if (userStorage.getUserById(user1Id) == null) {
+            throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", user1Id));
+        }
+
+        if (userStorage.getUserById(user2Id) == null) {
+            throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", user2Id));
+        }
 
         if (!friendMap.containsKey(user1Id)) {
             friendMap.put(user1Id, new HashSet<>());
@@ -36,21 +47,43 @@ public class UserService {
 
         friendMap.get(user1Id).add(user2Id);
         friendMap.get(user2Id).add(user1Id);
+
     }
 
-    public void deleteFriend(User user, User friend) {
-        Set<Long> friendSet = friendMap.get(user.getId());
+    public void deleteFriend(long user, long friend) {
+        if (user == friend) {
+            throw new IllegalStateException("Нельзя удалить самого себя из друзей");
+        }
+
+        Set<Long> friendSet = friendMap.get(user);
         if (friendSet != null) {
             friendSet.remove(friend);
         } else {
-            throw new FriendListEmptyException(String.format("Список друзей пользователя %s пуст", user.getName()));
+            checkUser(user);
         }
     }
 
-    public Set<User> mutualFriendList(User user1, User user2) {
+    public Set<User> friendList(long userId) {
+        Set<Long> friendSet = friendMap.get(userId);
+        if (friendSet != null) {
+            return friendSet.stream()
+                    .map(userStorage::getUserById)
+                    .collect(Collectors.toSet());
+        } else {
+            checkUser(userId);
+        }
+        return null;
+    }
+    public Set<User> mutualFriendList(long user1, long user2) {
         Set<Long> user1FriendList = friendMap.get(user1);
         Set<Long> user2FriendList = friendMap.get(user2);
+        if (user1FriendList == null) {
+            throw new FriendListEmptyException(String.format("У пользователя с id = %d список друзей пуст", user1));
+        }
 
+        if (user2FriendList == null) {
+            throw new FriendListEmptyException(String.format("У пользователя с id = %d список друзей пуст", user2));
+        }
         //В user1FriendList оставляем только те элементы, которые содержаться в user2FriendList
         user1FriendList.retainAll(user2FriendList);
 
@@ -60,5 +93,15 @@ public class UserService {
                 .collect(Collectors.toSet());
     }
 
-
+    //Метод выбрасывает соответствующее исключение, если пользователь отсутствует в UserStorage
+    //или у пользователя отсутствует список друзей
+    private void checkUser(long userId) {
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", userId));
+        } else {
+            throw new FriendListEmptyException(String.format("У пользователя %s нет друзей",
+                    user.getName()));
+        }
+    }
 }

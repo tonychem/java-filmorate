@@ -26,10 +26,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
-        film.setId(currentId);
-        films.put(currentId, film);
-        currentId++;
-        return film;
+        if (!films.values().contains(film)) {
+            film.setId(currentId);
+            films.put(currentId, film);
+            currentId++;
+            return film;
+        }
+        return null;
     }
 
     @Override
@@ -52,7 +55,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             return null;
         }
-
         return film;
     }
 }

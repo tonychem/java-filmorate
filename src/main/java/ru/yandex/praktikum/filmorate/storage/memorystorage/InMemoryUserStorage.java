@@ -27,10 +27,13 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        user.setId(currentId);
-        users.put(currentId, user);
-        currentId++;
-        return user;
+        if (!users.values().contains(user)) {
+            user.setId(currentId);
+            users.put(currentId, user);
+            currentId++;
+            return user;
+        }
+        return null;
     }
 
     @Override
