@@ -63,7 +63,6 @@ public class FilmController {
         filmService.removeLike(id, userId);
     }
 
-    // Посколько id назначается контроллером, считаем, что у старого и нового фильма совпадают хотя бы названия
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         validator.validateRequestBody(film);
