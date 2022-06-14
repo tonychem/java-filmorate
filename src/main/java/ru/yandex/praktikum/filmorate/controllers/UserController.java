@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.praktikum.filmorate.exception.NoSuchUserException;
-import ru.yandex.praktikum.filmorate.exception.UserAlreadyExistsException;
 import ru.yandex.praktikum.filmorate.model.User;
 import ru.yandex.praktikum.filmorate.service.UserService;
 import ru.yandex.praktikum.filmorate.storage.UserStorage;
@@ -60,28 +58,17 @@ public class UserController {
 
     @PostMapping
     public User addUser(@RequestBody User user) {
-        if (validator.validateRequestBody(user)) {
-            User userIdUpdated = userStorage.addUser(user);
-            log.info("Пользователь {} был добавлен", userIdUpdated.getLogin());
-
-            return userIdUpdated;
-        } else {
-            throw new UserAlreadyExistsException(String.format("Пользователь с логином %s уже существует",
-                    user.getLogin()));
-        }
+        validator.validateRequestBody(user);
+        User userIdUpdated = userStorage.addUser(user);
+        log.info("Пользователь {} был добавлен", userIdUpdated.getLogin());
+        return userIdUpdated;
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
         validator.validateRequestBody(user);
-
         User userToBeUpdated = userStorage.updateUser(user);
-
-        if (userToBeUpdated != null) {
-            log.info("Информация о пользователе {} была обновлена", userToBeUpdated.getLogin());
-            return userToBeUpdated;
-        } else {
-            throw new NoSuchUserException(String.format("Пользователь с id = %d отсутствует", user.getId()));
-        }
+        log.info("Информация о пользователе {} была обновлена", userToBeUpdated.getLogin());
+        return userToBeUpdated;
     }
 }

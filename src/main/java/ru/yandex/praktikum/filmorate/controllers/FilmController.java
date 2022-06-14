@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.praktikum.filmorate.exception.FilmAlreadyExistsException;
-import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.service.FilmService;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
@@ -46,13 +44,11 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
-        if (validator.validateRequestBody(film)) {
-            Film filmIdUpdated = filmStorage.addFilm(film);
-            log.info("Фильм с названием {} был добавлен", filmIdUpdated.getName());
-            return filmIdUpdated;
-        } else {
-            throw new FilmAlreadyExistsException(String.format("Фильм %s уже существует", film.getName()));
-        }
+        validator.validateRequestBody(film);
+        Film filmIdUpdated = filmStorage.addFilm(film);
+        log.info("Фильм с названием {} был добавлен", filmIdUpdated.getName());
+        return filmIdUpdated;
+
     }
 
     @PutMapping(value = "/{id}/like/{userId}")
@@ -71,15 +67,9 @@ public class FilmController {
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         validator.validateRequestBody(film);
-
         Film filmToBeUpdated = filmStorage.updateFilm(film);
-
-        if (filmToBeUpdated != null) {
-            log.info("Фильм с названием {} был обновлен", filmToBeUpdated.getName());
-            return filmToBeUpdated;
-        } else {
-            throw new NoSuchFilmException(String.format("Фильм с названием %s отсутствует", film.getName()));
-        }
+        log.info("Фильм с названием {} был обновлен", filmToBeUpdated.getName());
+        return filmToBeUpdated;
     }
 }
 
