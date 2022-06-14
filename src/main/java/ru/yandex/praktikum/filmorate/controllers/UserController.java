@@ -1,5 +1,6 @@
 package ru.yandex.praktikum.filmorate.controllers;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +19,11 @@ import java.util.Set;
 @Slf4j
 @Validated
 @RequestMapping(value = "/users")
+@AllArgsConstructor
 public class UserController {
     private final Validator validator;
     private final UserStorage userStorage;
     private final UserService userService;
-
-    public UserController(Validator validator, UserStorage userStorage, UserService userService) {
-        this.validator = validator;
-        this.userStorage = userStorage;
-        this.userService = userService;
-    }
 
     @GetMapping
     public Collection<User> getUsers() {
@@ -36,7 +32,7 @@ public class UserController {
 
     @GetMapping(value = "/{id}")
     public User getUserById(@PathVariable @Positive long id) {
-        return userStorage.getUserById(id);
+        return userStorage.userById(id);
     }
 
     @GetMapping(value = "/{id}/friends")

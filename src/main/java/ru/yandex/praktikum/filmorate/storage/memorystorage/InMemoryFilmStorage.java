@@ -15,7 +15,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private long currentId = 1;
 
     @Override
-    public Film getFilmById(long id) {
+    public Film filmById(long id) {
         return films.get(id);
     }
 
@@ -37,8 +37,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public boolean deleteFilm(long id) {
-        Film filmToBeDeleted = films.remove(id);
-        return filmToBeDeleted != null;
+        return films.remove(id) != null;
     }
 
     @Override

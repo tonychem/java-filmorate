@@ -5,7 +5,7 @@ import ru.yandex.praktikum.filmorate.model.Film;
 import java.util.Collection;
 
 public interface FilmStorage {
-    Film getFilmById(long id);
+    Film filmById(long id);
     Collection<Film> films();
     Film addFilm(Film Film);
     boolean deleteFilm(long id);

@@ -1,5 +1,6 @@
 package ru.yandex.praktikum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.exception.NoSuchUserException;
@@ -11,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
@@ -19,17 +21,12 @@ public class FilmService {
     //Отображение Id фильма на множество Id пользователей, лайкнувших фильм
     private final Map<Long, Set<Long>> filmLikeMap = new HashMap<>();
 
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.userStorage = userStorage;
-        this.filmStorage = filmStorage;
-    }
-
     public void hitLike(long filmId, long userId) {
-        if (filmStorage.getFilmById(filmId) == null) {
+        if (filmStorage.filmById(filmId) == null) {
             throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", filmId));
         }
 
-        if (userStorage.getUserById(userId) == null) {
+        if (userStorage.userById(userId) == null) {
             throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", userId));
         }
 
@@ -54,7 +51,7 @@ public class FilmService {
         List<Film> listOfMostPopularFilmsCachedInLikeMap = filmLikeMap.entrySet().stream()
                 .sorted((entry1, entry2) -> (-1) * Long.compare(entry1.getValue().size(), entry2.getValue().size()))
                 .limit(limit)
-                .map(x -> filmStorage.getFilmById(x.getKey()))
+                .map(x -> filmStorage.filmById(x.getKey()))
                 .collect(Collectors.toList());
 
         // Поскольку фильмы не кешируются в filmLikeMap до тех пор, пока не был вызван метод hitLike,
@@ -75,7 +72,7 @@ public class FilmService {
     }
 
     private void checkFilm(long filmId) {
-        Film film = filmStorage.getFilmById(filmId);
+        Film film = filmStorage.filmById(filmId);
         if (film == null) {
             throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", filmId));
         }

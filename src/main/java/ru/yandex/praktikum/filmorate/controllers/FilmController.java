@@ -1,5 +1,6 @@
 package ru.yandex.praktikum.filmorate.controllers;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +19,11 @@ import java.util.List;
 @RequestMapping(value = "/films")
 @Slf4j
 @Validated
+@AllArgsConstructor
 public class FilmController {
     private final Validator validator;
     private final FilmService filmService;
     private final FilmStorage filmStorage;
-
-    public FilmController(Validator validator, FilmStorage filmStorage, FilmService filmService) {
-        this.validator = validator;
-        this.filmStorage = filmStorage;
-        this.filmService = filmService;
-    }
 
     @GetMapping
     public Collection<Film> getFilms() {
@@ -36,7 +32,7 @@ public class FilmController {
 
     @GetMapping(value = "/{id}")
     public Film getFilmById(@PathVariable @Positive long id) {
-        return filmStorage.getFilmById(id);
+        return filmStorage.filmById(id);
     }
 
     @GetMapping(value = "/popular")
