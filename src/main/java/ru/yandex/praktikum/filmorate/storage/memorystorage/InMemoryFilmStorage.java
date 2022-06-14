@@ -1,13 +1,14 @@
 package ru.yandex.praktikum.filmorate.storage.memorystorage;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.praktikum.filmorate.exception.FilmAlreadyExistsException;
+import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -26,13 +27,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
-        if (!films.values().contains(film)) {
+        if (films.values().contains(film)) {
+            throw new FilmAlreadyExistsException(String.format("Фильм %s уже существует", film.getName()));
+        } else {
             film.setId(currentId);
             films.put(currentId, film);
             currentId++;
             return film;
         }
-        return null;
     }
 
     @Override
@@ -42,18 +44,12 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        Optional<Film> filmToBeUpdated = films.values().stream()
-                .filter(x -> x.getId() == film.getId())
-                .findAny();
-
-        Optional<Long> id = filmToBeUpdated.map(Film::getId).or(() -> Optional.empty());
-
-        if (id.isPresent()) {
-            film.setId(id.get());
-            films.put(id.get(), film);
+        long id = film.getId();
+        if (films.containsKey(id)) {
+            films.put(id, film);
+            return film;
         } else {
-            return null;
+            throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", id));
         }
-        return film;
     }
 }

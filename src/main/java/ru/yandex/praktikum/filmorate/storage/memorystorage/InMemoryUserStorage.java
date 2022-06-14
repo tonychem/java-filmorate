@@ -1,13 +1,14 @@
 package ru.yandex.praktikum.filmorate.storage.memorystorage;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.praktikum.filmorate.exception.NoSuchUserException;
+import ru.yandex.praktikum.filmorate.exception.UserAlreadyExistsException;
 import ru.yandex.praktikum.filmorate.model.User;
 import ru.yandex.praktikum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -27,37 +28,31 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        if (!users.values().contains(user)) {
+        if (users.values().contains(user)) {
+            throw new UserAlreadyExistsException(String.format("Пользователь с логином %s уже существует",
+                    user.getLogin()));
+        } else {
             user.setId(currentId);
             users.put(currentId, user);
             currentId++;
             return user;
         }
-        return null;
     }
 
     @Override
     public boolean deleteUser(long id) {
-        User userToBeDeleted = users.remove(id);
-        return userToBeDeleted != null;
+        return users.remove(id) != null;
     }
 
 
     @Override
     public User updateUser(User user) {
-        Optional<User> userToBeUpdated = users.values().stream()
-                .filter(x -> x.getId() == user.getId())
-                .findAny();
-
-        Optional<Long> id = userToBeUpdated.map(User::getId).or(() -> Optional.empty());
-
-        if (id.isPresent()) {
-            user.setId(id.get());
-            users.put(id.get(), user);
+        long id = user.getId();
+        if (users.containsKey(id)) {
+            users.put(id, user);
+            return user;
         } else {
-            return null;
+            throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", id));
         }
-
-        return user;
     }
 }
