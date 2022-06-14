@@ -29,8 +29,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User addUser(User user) {
         if (users.values().contains(user)) {
-            throw new UserAlreadyExistsException(String.format("Пользователь с логином %s уже существует",
-                    user.getLogin()));
+            throw new UserAlreadyExistsException(String.format("Пользователь с логином %s уже существует", user.getLogin()));
         } else {
             user.setId(currentId);
             users.put(currentId, user);

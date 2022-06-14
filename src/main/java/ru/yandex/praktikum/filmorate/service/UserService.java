@@ -55,8 +55,8 @@ public class UserService {
                     .collect(Collectors.toSet());
         } else {
             checkUserExists(userId);
+            return Collections.emptySet();
         }
-        return Collections.emptySet();
     }
 
     public Set<User> mutualFriendList(long firstUser, long secondUser) {

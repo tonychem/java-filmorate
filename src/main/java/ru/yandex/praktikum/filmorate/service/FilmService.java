@@ -3,7 +3,6 @@ package ru.yandex.praktikum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
-import ru.yandex.praktikum.filmorate.exception.NoSuchUserException;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 import ru.yandex.praktikum.filmorate.storage.UserStorage;
@@ -22,14 +21,6 @@ public class FilmService {
     private final Map<Long, Set<Long>> filmLikeMap = new HashMap<>();
 
     public void hitLike(long filmId, long userId) {
-        if (filmStorage.filmById(filmId) == null) {
-            throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", filmId));
-        }
-
-        if (userStorage.userById(userId) == null) {
-            throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", userId));
-        }
-
         if (!filmLikeMap.containsKey(filmId)) {
             filmLikeMap.put(filmId, new HashSet<>());
         }
