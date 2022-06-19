@@ -1,76 +1,74 @@
 package ru.yandex.praktikum.filmorate.controllers;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.praktikum.filmorate.model.User;
-import ru.yandex.praktikum.filmorate.validation.ValidationException;
+import ru.yandex.praktikum.filmorate.service.UserService;
+import ru.yandex.praktikum.filmorate.storage.UserStorage;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
-import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @Slf4j
+@Validated
 @RequestMapping(value = "/users")
+@AllArgsConstructor
 public class UserController {
-    private Map<Long, User> users = new HashMap<>();
     private final Validator validator;
-
-    private long currentId = 1;
-
-    public UserController(Validator validator) {
-        this.validator = validator;
-    }
+    private final UserStorage userStorage;
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> getUsers() {
-        return users.values();
+        return userStorage.users();
+    }
+
+    @GetMapping(value = "/{id}")
+    public User getUserById(@PathVariable @Positive long id) {
+        return userStorage.userById(id);
+    }
+
+    @GetMapping(value = "/{id}/friends")
+    public Set<User> getFriendListOfUser(@PathVariable @Positive long id) {
+        return userService.friendList(id);
+    }
+
+    @GetMapping(value = "/{id}/friends/common/{otherId}")
+    public Set<User> getMutualFriends(@PathVariable @Positive long id,
+                                      @PathVariable @Positive long otherId) {
+        return userService.mutualFriendList(id, otherId);
+    }
+
+    @PutMapping(value = "/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable @Positive long id,
+                          @PathVariable @Positive long friendId) {
+        userService.befriend(id, friendId);
+    }
+
+    @DeleteMapping(value = "/{id}/friends/{friendId}")
+    public void deleteFromFriendList(@PathVariable @Positive long id,
+                                     @PathVariable @Positive long friendId) {
+        userService.deleteFriend(id, friendId);
     }
 
     @PostMapping
-    public User addUser(@Valid @RequestBody User user) {
-        try {
-            validator.validateRequestBody(user);
-        } catch (ValidationException e) {
-            log.warn(e.getMessage() + "\n" + user);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        // Приходящему пользователю устанавливается id
-        user.setId(currentId);
-
-        users.put(user.getId(), user);
-        currentId++;
-        log.info("Пользователь {} был добавлен", user.getLogin());
-
-        return user;
+    public User addUser(@RequestBody User user) {
+        validator.validateRequestBody(user);
+        User userIdUpdated = userStorage.addUser(user);
+        log.info("Пользователь {} был добавлен", userIdUpdated.getLogin());
+        return userIdUpdated;
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
-        try {
-            validator.validateRequestBody(user);
-        } catch (ValidationException e) {
-            log.warn(e.getMessage() + "\n" + user);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        // Проверяем, есть ли в таблице пользователь с таким же id
-        Optional<User> userToBeUpdated = users.values().stream()
-                .filter(x -> x.getId() == user.getId())
-                .findAny();
-        //Если в таблице находится пользователь с таким id, то извлекаем данный id, иначе бросаем NOT_FOUND
-        long id = userToBeUpdated.map(User::getId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND));
-        user.setId(id);
-        users.put(id, user);
-        log.info("Информация о пользователе {} была обновлена", user.getLogin());
-
-        return user;
+    public User updateUser(@RequestBody User user) {
+        validator.validateRequestBody(user);
+        User userToBeUpdated = userStorage.updateUser(user);
+        log.info("Информация о пользователе {} была обновлена", userToBeUpdated.getLogin());
+        return userToBeUpdated;
     }
 }

@@ -1,15 +1,13 @@
 package ru.yandex.praktikum.filmorate.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class Film {
+    @EqualsAndHashCode.Exclude
     private long id;
 
     @NonNull

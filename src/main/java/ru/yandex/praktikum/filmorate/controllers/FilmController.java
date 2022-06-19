@@ -1,79 +1,74 @@
 package ru.yandex.praktikum.filmorate.controllers;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.praktikum.filmorate.model.Film;
-import ru.yandex.praktikum.filmorate.validation.ValidationException;
+import ru.yandex.praktikum.filmorate.service.FilmService;
+import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
-import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/films")
 @Slf4j
+@Validated
+@AllArgsConstructor
 public class FilmController {
-    private Map<Long, Film> films = new HashMap<>();
-
     private final Validator validator;
-    //Контроллер присваивает id приходящим объектам
-    private long currentId = 1;
-
-    public FilmController(Validator validator) {
-        this.validator = validator;
-    }
+    private final FilmService filmService;
+    private final FilmStorage filmStorage;
 
     @GetMapping
     public Collection<Film> getFilms() {
-        return films.values();
+        return filmStorage.films();
+    }
+
+    @GetMapping(value = "/{id}")
+    public Film getFilmById(@PathVariable @Positive long id) {
+        return filmStorage.filmById(id);
+    }
+
+    @GetMapping(value = "/popular")
+    public List<Film> getMostLikedFilms(@RequestParam(required = false) @Positive Integer count) {
+        if (count != null) {
+            return filmService.getMostLikedFilms(count);
+        } else {
+            return filmService.getMostLikedFilms(10);
+        }
     }
 
     @PostMapping
-    public Film addFilm(@Valid @RequestBody Film film) {
-        //Если объект валидный - присвоить id и записать в таблицу, иначе - записать в лог и выбросить исключение
-        try {
-            validator.validateRequestBody(film);
-        } catch (ValidationException e) {
-            log.warn(e.getMessage() + "\n" + film);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+    public Film addFilm(@RequestBody Film film) {
+        validator.validateRequestBody(film);
+        Film filmIdUpdated = filmStorage.addFilm(film);
+        log.info("Фильм с названием {} был добавлен", filmIdUpdated.getName());
+        return filmIdUpdated;
 
-        film.setId(currentId);
-        films.put(currentId, film);
-        log.info("Фильм с названием {} был добавлен", film.getName());
-        currentId++;
-
-        return film;
     }
 
-    // Посколько id назначается контроллером, считаем, что у старого и нового фильма совпадают хотя бы названия
+    @PutMapping(value = "/{id}/like/{userId}")
+    public void hitLike(@PathVariable @Positive long id,
+                        @PathVariable @Positive long userId) {
+        filmService.hitLike(id, userId);
+    }
+
+    @DeleteMapping(value = "/{id}/like/{userId}")
+    public void removeLike(@PathVariable @Positive long id,
+                           @PathVariable @Positive long userId) {
+        filmService.removeLike(id, userId);
+    }
+
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
-        //Если объект валидный - присвоить id и записать в таблицу, иначе - записать в лог и выбросить исключение
-        try {
-            validator.validateRequestBody(film);
-        } catch (ValidationException e) {
-            log.warn(e.getMessage() + "\n" + film);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        Optional<Film> filmToBeUpdated = films.values().stream()
-                .filter(x -> x.getId() == film.getId())
-                .findAny();
-
-        //Если в таблице находится фильм с таким id, то извлекаем данный id, иначе присваиваем текущий id
-        long id = filmToBeUpdated.map(Film::getId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND));
-        film.setId(id);
-        films.put(id, film);
-        log.info("Фильм с названием {} был обновлен", film.getName());
-
-        return film;
+    public Film updateFilm(@RequestBody Film film) {
+        validator.validateRequestBody(film);
+        Film filmToBeUpdated = filmStorage.updateFilm(film);
+        log.info("Фильм с названием {} был обновлен", filmToBeUpdated.getName());
+        return filmToBeUpdated;
     }
 }
 

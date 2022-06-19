@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class User {
+    @EqualsAndHashCode.Exclude
     private long id;
 
     @NonNull
@@ -24,4 +25,5 @@ public class User {
 
     @NonNull
     private String birthday;
+
 }
