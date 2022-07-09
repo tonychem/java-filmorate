@@ -1,6 +1,5 @@
-package ru.yandex.praktikum.filmorate.service.InMemoryImpl;
+package ru.yandex.praktikum.filmorate.service.inmemoryservice;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;

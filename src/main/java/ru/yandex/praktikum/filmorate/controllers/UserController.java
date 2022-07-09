@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.praktikum.filmorate.model.User;
-import ru.yandex.praktikum.filmorate.service.InMemoryImpl.InMemoryUserService;
+import ru.yandex.praktikum.filmorate.service.inmemoryservice.InMemoryUserService;
 import ru.yandex.praktikum.filmorate.storage.UserStorage;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 

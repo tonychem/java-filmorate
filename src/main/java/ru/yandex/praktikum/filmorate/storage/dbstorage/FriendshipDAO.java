@@ -2,7 +2,6 @@ package ru.yandex.praktikum.filmorate.storage.dbstorage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +17,7 @@ public class FriendshipDAO {
 
     /**
      * Находит всех друзей пользователя с id userId
+     *
      * @param userId - id пользователя, чьих друзей ищем
      * @return список id друзей пользователя
      */
@@ -39,23 +39,19 @@ public class FriendshipDAO {
     }
 
     public void acceptFriendRequest(long senderUserId, long acceptingUserId) {
-        if (checkFriendRequest(senderUserId, acceptingUserId)) {
-            jdbcTemplate.update("UPDATE friendship SET accepted = true " +
-                    "WHERE userone_id = ? AND usertwo_id = ?", acceptingUserId, senderUserId);
-        }
+        jdbcTemplate.update("UPDATE friendship SET accepted = true " +
+                "WHERE userone_id = ? AND usertwo_id = ?", acceptingUserId, senderUserId);
     }
 
     public void declineFriendRequest(long senderUserId, long decliningUserId) {
-        if (checkFriendRequest(senderUserId, decliningUserId)) {
-            jdbcTemplate.update("DELETE FROM friendship WHERE userone_id = ? AND usertwo_id = ?",
-                    senderUserId, decliningUserId);
-            jdbcTemplate.update("DELETE FROM friendship WHERE userone_id = ? AND usertwo_id = ?",
-                    decliningUserId, senderUserId);
-        }
+        jdbcTemplate.update("DELETE FROM friendship WHERE userone_id = ? AND usertwo_id = ?",
+                senderUserId, decliningUserId);
+        jdbcTemplate.update("DELETE FROM friendship WHERE userone_id = ? AND usertwo_id = ?",
+                decliningUserId, senderUserId);
     }
 
     //Проверяет, есть ли запрос на дружбу от senderUser к acceptingUser
-    private boolean checkFriendRequest(long senderUser, long acceptingUser) {
+    public boolean checkFriendRequest(long senderUser, long acceptingUser) {
         SqlRowSet rs1 = jdbcTemplate.queryForRowSet("SELECT * FROM FRIENDSHIP " +
                         "WHERE userone_id = ? AND usertwo_id = ? AND accepted = true",
                 senderUser, acceptingUser);
@@ -64,4 +60,6 @@ public class FriendshipDAO {
                 acceptingUser, senderUser);
         return rs1.next() && rs2.next();
     }
+
+
 }
