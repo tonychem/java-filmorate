@@ -1,20 +1,17 @@
 package ru.yandex.praktikum.filmorate.service.dbservice;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ru.yandex.praktikum.filmorate.model.User;
 import ru.yandex.praktikum.filmorate.service.UserService;
 import ru.yandex.praktikum.filmorate.storage.UserStorage;
 import ru.yandex.praktikum.filmorate.storage.dbstorage.FriendshipDAO;
-import ru.yandex.praktikum.filmorate.storage.dbstorage.UsersDAO;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Repository
+@Repository(value = "UserServiceDB")
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;

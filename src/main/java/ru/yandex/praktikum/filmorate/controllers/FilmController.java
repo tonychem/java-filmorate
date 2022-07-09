@@ -2,10 +2,11 @@ package ru.yandex.praktikum.filmorate.controllers;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.praktikum.filmorate.model.Film;
-import ru.yandex.praktikum.filmorate.service.inmemoryservice.InMemoryFilmService;
+import ru.yandex.praktikum.filmorate.service.FilmService;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
@@ -17,11 +18,18 @@ import java.util.List;
 @RequestMapping(value = "/films")
 @Slf4j
 @Validated
-@AllArgsConstructor
 public class FilmController {
     private final Validator validator;
-    private final InMemoryFilmService inMemoryFilmService;
+    private final FilmService filmService;
     private final FilmStorage filmStorage;
+
+    public FilmController(Validator validator,
+                          @Qualifier(value = "FilmServiceDB") FilmService filmService,
+                          @Qualifier(value = "FilmDBStorage") FilmStorage filmStorage) {
+        this.validator = validator;
+        this.filmService = filmService;
+        this.filmStorage = filmStorage;
+    }
 
     @GetMapping
     public Collection<Film> getFilms() {
@@ -36,9 +44,9 @@ public class FilmController {
     @GetMapping(value = "/popular")
     public List<Film> getMostLikedFilms(@RequestParam(required = false) @Positive Integer count) {
         if (count != null) {
-            return inMemoryFilmService.getMostLikedFilms(count);
+            return filmService.getMostLikedFilms(count);
         } else {
-            return inMemoryFilmService.getMostLikedFilms(10);
+            return filmService.getMostLikedFilms(10);
         }
     }
 
@@ -54,13 +62,13 @@ public class FilmController {
     @PutMapping(value = "/{id}/like/{userId}")
     public void hitLike(@PathVariable @Positive long id,
                         @PathVariable @Positive long userId) {
-        inMemoryFilmService.hitLike(id, userId);
+        filmService.hitLike(id, userId);
     }
 
     @DeleteMapping(value = "/{id}/like/{userId}")
     public void removeLike(@PathVariable @Positive long id,
                            @PathVariable @Positive long userId) {
-        inMemoryFilmService.removeLike(id, userId);
+        filmService.removeLike(id, userId);
     }
 
     @PutMapping

@@ -14,7 +14,7 @@ import ru.yandex.praktikum.filmorate.storage.dbstorage.FilmLikesDAO;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Repository
+@Repository(value = "FilmServiceDB")
 public class FilmServiceImpl implements FilmService {
 
     private final FilmLikesDAO filmLikesDAO;
@@ -23,7 +23,7 @@ public class FilmServiceImpl implements FilmService {
     private final UserStorage userStorage;
 
     public FilmServiceImpl(FilmLikesDAO filmLikesDAO,
-                           @Qualifier(value ="FilmDBStorage") FilmStorage filmStorage,
+                           @Qualifier(value = "FilmDBStorage") FilmStorage filmStorage,
                            @Qualifier(value = "UserDBStorage") UserStorage userStorage) {
         this.filmLikesDAO = filmLikesDAO;
         this.filmStorage = filmStorage;
