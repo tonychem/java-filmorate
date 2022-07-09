@@ -1,8 +1,10 @@
 package ru.yandex.praktikum.filmorate.model;
 
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
@@ -22,4 +24,11 @@ public class Film {
 
     @NonNull
     private int duration;
+
+    @EqualsAndHashCode.Exclude
+    @Nullable
+    private List<Integer> genres;
+
+    @EqualsAndHashCode.Exclude
+    private int rating;
 }

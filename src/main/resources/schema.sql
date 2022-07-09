@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS films (
     description text,
     releaseDate date,
     duration int4,
-    rating_id int4 REFERENCES ratings(rating_id)
+    rating_id int4 REFERENCES ratings(rating_id) ON DELETE SET DEFAULT -1
 );
 
 CREATE TABLE IF NOT EXISTS genres (
@@ -27,20 +27,20 @@ CREATE TABLE IF NOT EXISTS genres (
 );
 
 CREATE TABLE IF NOT EXISTS film_genres (
-    film_id int8 REFERENCES films(film_id),
-    genre_id int4 REFERENCES genres(genre_id),
+    film_id int8 REFERENCES films(film_id) ON DELETE CASCADE,
+    genre_id int4 REFERENCES genres(genre_id) ON DELETE CASCADE,
     PRIMARY KEY(film_id, genre_id)
 );
 
 CREATE TABLE IF NOT EXISTS friendship (
-    userOne_id int8 REFERENCES users(user_id),
-    userTwo_id int8 REFERENCES users(user_id),
+    userOne_id int8 REFERENCES users(user_id) ON DELETE CASCADE,
+    userTwo_id int8 REFERENCES users(user_id) ON DELETE CASCADE,
     accepted bool,
     PRIMARY KEY (userOne_id, userTwo_id)
 );
 
 CREATE TABLE IF NOT EXISTS film_likes (
-    film_id int8 REFERENCES films(film_id),
-    user_id int8 REFERENCES users(user_id),
+    film_id int8 REFERENCES films(film_id) ON DELETE CASCADE,
+    user_id int8 REFERENCES users(user_id) ON DELETE CASCADE,
     PRIMARY KEY(film_id, user_id)
 )

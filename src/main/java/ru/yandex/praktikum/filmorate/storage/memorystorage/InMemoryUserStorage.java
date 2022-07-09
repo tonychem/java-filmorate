@@ -1,6 +1,6 @@
 package ru.yandex.praktikum.filmorate.storage.memorystorage;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.praktikum.filmorate.exception.NoSuchUserException;
 import ru.yandex.praktikum.filmorate.exception.UserAlreadyExistsException;
 import ru.yandex.praktikum.filmorate.model.User;
@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Repository(value = "InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
 
     private long currentId = 1;

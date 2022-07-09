@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.praktikum.filmorate.model.Film;
-import ru.yandex.praktikum.filmorate.service.FilmService;
+import ru.yandex.praktikum.filmorate.service.InMemoryImpl.InMemoryFilmService;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FilmController {
     private final Validator validator;
-    private final FilmService filmService;
+    private final InMemoryFilmService inMemoryFilmService;
     private final FilmStorage filmStorage;
 
     @GetMapping
@@ -36,9 +36,9 @@ public class FilmController {
     @GetMapping(value = "/popular")
     public List<Film> getMostLikedFilms(@RequestParam(required = false) @Positive Integer count) {
         if (count != null) {
-            return filmService.getMostLikedFilms(count);
+            return inMemoryFilmService.getMostLikedFilms(count);
         } else {
-            return filmService.getMostLikedFilms(10);
+            return inMemoryFilmService.getMostLikedFilms(10);
         }
     }
 
@@ -54,13 +54,13 @@ public class FilmController {
     @PutMapping(value = "/{id}/like/{userId}")
     public void hitLike(@PathVariable @Positive long id,
                         @PathVariable @Positive long userId) {
-        filmService.hitLike(id, userId);
+        inMemoryFilmService.hitLike(id, userId);
     }
 
     @DeleteMapping(value = "/{id}/like/{userId}")
     public void removeLike(@PathVariable @Positive long id,
                            @PathVariable @Positive long userId) {
-        filmService.removeLike(id, userId);
+        inMemoryFilmService.removeLike(id, userId);
     }
 
     @PutMapping

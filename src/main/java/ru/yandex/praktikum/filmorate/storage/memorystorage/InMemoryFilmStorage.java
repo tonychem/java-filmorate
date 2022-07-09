@@ -1,6 +1,6 @@
 package ru.yandex.praktikum.filmorate.storage.memorystorage;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.praktikum.filmorate.exception.FilmAlreadyExistsException;
 import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.model.Film;
@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Repository(value = "InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Long, Film> films = new HashMap<>();
     private long currentId = 1;

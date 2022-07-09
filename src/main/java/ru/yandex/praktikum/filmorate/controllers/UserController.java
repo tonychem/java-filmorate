@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.praktikum.filmorate.model.User;
-import ru.yandex.praktikum.filmorate.service.UserService;
+import ru.yandex.praktikum.filmorate.service.InMemoryImpl.InMemoryUserService;
 import ru.yandex.praktikum.filmorate.storage.UserStorage;
 import ru.yandex.praktikum.filmorate.validation.Validator;
 
@@ -21,7 +21,7 @@ import java.util.Set;
 public class UserController {
     private final Validator validator;
     private final UserStorage userStorage;
-    private final UserService userService;
+    private final InMemoryUserService inMemoryUserService;
 
     @GetMapping
     public Collection<User> getUsers() {
@@ -35,25 +35,25 @@ public class UserController {
 
     @GetMapping(value = "/{id}/friends")
     public Set<User> getFriendListOfUser(@PathVariable @Positive long id) {
-        return userService.friendList(id);
+        return inMemoryUserService.friendList(id);
     }
 
     @GetMapping(value = "/{id}/friends/common/{otherId}")
     public Set<User> getMutualFriends(@PathVariable @Positive long id,
                                       @PathVariable @Positive long otherId) {
-        return userService.mutualFriendList(id, otherId);
+        return inMemoryUserService.mutualFriendList(id, otherId);
     }
 
     @PutMapping(value = "/{id}/friends/{friendId}")
     public void addFriend(@PathVariable @Positive long id,
                           @PathVariable @Positive long friendId) {
-        userService.befriend(id, friendId);
+        inMemoryUserService.befriend(id, friendId);
     }
 
     @DeleteMapping(value = "/{id}/friends/{friendId}")
     public void deleteFromFriendList(@PathVariable @Positive long id,
                                      @PathVariable @Positive long friendId) {
-        userService.deleteFriend(id, friendId);
+        inMemoryUserService.deleteFriend(id, friendId);
     }
 
     @PostMapping
