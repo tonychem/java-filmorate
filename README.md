@@ -6,7 +6,7 @@
 3. Вывести всех пользователей, которые лайкнули фильм с id = 1.
 ```sql
 SELECT u.name
-FROM user u
+FROM users u
 WHERE u.user_id IN (
 	SELECT fl.user_id
 	FROM film_likes fl
@@ -16,7 +16,7 @@ WHERE u.user_id IN (
 4. Вывести топ 10 фильмов.
 ```sql
 SELECT f.name
-FROM film f
+FROM films f
 INNER JOIN (
 	SELECT fl.film_id, COUNT(user_id) likes
 	FROM film_likes fl
@@ -28,7 +28,7 @@ INNER JOIN (
 5. Найти общих друзей пользователя id = 1 и id = 2
 ```sql
 SELECT name
-FROM user
+FROM users
 WHERE user_id IN (
 	SELECT first_user_friendlist.userTwo_id --вывести id общего друга
 	FROM (

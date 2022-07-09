@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS film_genres (
 CREATE TABLE IF NOT EXISTS friendship (
     userOne_id int8 REFERENCES users(user_id),
     userTwo_id int8 REFERENCES users(user_id),
+    accepted bool,
     PRIMARY KEY (userOne_id, userTwo_id)
 );
 
