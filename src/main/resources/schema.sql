@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS films (
     description text,
     releaseDate date,
     duration int4,
-    rating_id int4 REFERENCES ratings(rating_id) ON DELETE SET DEFAULT -1
+    rating_id int4 REFERENCES ratings(rating_id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS genres (

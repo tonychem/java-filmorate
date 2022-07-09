@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.filmorate.storage.dbstorage;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,7 @@ public class GenresDAO {
 
     /**
      * Извлечь название жанра по id
+     *
      * @param genreId - id жанра
      * @return Название жанра
      */
@@ -28,6 +30,7 @@ public class GenresDAO {
 
     /**
      * Добавить новый жанр в таблицу
+     *
      * @param genreName - название жанра
      * @return true - если жанр был добавлен
      */
@@ -37,6 +40,7 @@ public class GenresDAO {
 
     /**
      * Вернуть список id жанров для данного фильма
+     *
      * @param filmId - id фильма
      * @return Список id жанров для данного фильма
      */
@@ -52,7 +56,8 @@ public class GenresDAO {
 
     /**
      * Добавить список жанров для фильма в таблицу FILM_GENRES
-     * @param filmId - id фильма
+     *
+     * @param filmId       - id фильма
      * @param listOfGenres - список жанров фильма
      * @return true - если все значения были добавлены в таблицу
      */
@@ -66,6 +71,7 @@ public class GenresDAO {
 
     /**
      * Удаляет жанр из таблицы GENRES
+     *
      * @param genreId - id жанра
      * @return true - если жанр блы удален
      */

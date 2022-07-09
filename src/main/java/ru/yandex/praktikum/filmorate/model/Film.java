@@ -3,6 +3,7 @@ package ru.yandex.praktikum.filmorate.model;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class Film {
     @NonNull
     private String releaseDate;
 
-    @NonNull
+    @Min(value = 1)
     private int duration;
 
     @EqualsAndHashCode.Exclude

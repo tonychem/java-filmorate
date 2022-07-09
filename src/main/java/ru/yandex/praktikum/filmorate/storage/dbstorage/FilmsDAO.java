@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.filmorate.storage.dbstorage;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -9,6 +10,7 @@ import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,12 +18,10 @@ import java.util.List;
  * DAO-класс для работы с таблицей FILMS
  */
 @Repository(value = "FilmDBStorage")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class FilmsDAO implements FilmStorage {
-
-    private final JdbcTemplate jdbcTemplate;
-    private final RatingsDAO ratingsDAO;
-    private final GenresDAO genresDAO;
+    private JdbcTemplate jdbcTemplate;
+    private GenresDAO genresDAO;
 
     private final RowMapper<Film> filmRowMapper = (rs, row) -> {
         long filmId = rs.getLong(1);
