@@ -22,10 +22,7 @@ public class FriendshipDAO {
      * @return список id друзей пользователя
      */
     public List<Long> getAllFriendsForUser(long userId) {
-        String sqlSubquery = "SELECT usertwo_id FROM FRIENDSHIP WHERE userone_id = ? AND accepted = true";
-        String sqlQuery = String.format("SELECT userone_id from FRIENDSHIP WHERE userone_id IN (%s) and accepted = true",
-                sqlSubquery);
-
+        String sqlQuery = "SELECT usertwo_id FROM friendship WHERE userone_id = ? AND accepted = true";
         return jdbcTemplate.queryForList(sqlQuery, long.class, userId);
     }
 
@@ -33,6 +30,8 @@ public class FriendshipDAO {
         if (fromUserOne == toUserTwo) {
             throw new RuntimeException(); //TODO: изменить
         }
+
+        //TODO: проверить, что пользователи существуют
         // вносится запись, что userOne отправил запрос на дружбу к userTwo
         jdbcTemplate.update("INSERT INTO FRIENDSHIP(userone_id, usertwo_id, accepted) VALUES (?, ?, true)",
                 fromUserOne, toUserTwo);
