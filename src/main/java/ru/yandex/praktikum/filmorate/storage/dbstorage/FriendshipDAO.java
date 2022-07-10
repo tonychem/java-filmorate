@@ -65,5 +65,4 @@ public class FriendshipDAO {
         return rs1.next() && rs2.next();
     }
 
-
 }

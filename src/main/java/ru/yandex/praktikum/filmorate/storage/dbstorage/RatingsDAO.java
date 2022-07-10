@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.praktikum.filmorate.exception.NoSuchRatingException;
 import ru.yandex.praktikum.filmorate.model.MPA;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class RatingsDAO {
         if (rowSet.next()) {
             return rowSet.getString(1);
         } else {
-            throw new RuntimeException(); //TODO: создать кастомную!
+            throw new NoSuchRatingException(String.format("Рейтинга с id = %d не существует", ratingId)); //TODO: создать кастомную!
         }
     }
 

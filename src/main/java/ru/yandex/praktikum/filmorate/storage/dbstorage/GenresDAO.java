@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.praktikum.filmorate.exception.NoSuchGenreException;
 import ru.yandex.praktikum.filmorate.model.Genre;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class GenresDAO {
         if (rs.next()) {
             return rs.getString(1);
         } else {
-            throw new RuntimeException(); //TODO: new exception добавить везде!
+            throw new NoSuchGenreException(String.format("Жанра с id = %d не существует", genreId)); //TODO: new exception добавить везде!
         }
     }
 

@@ -33,8 +33,35 @@ public class FilmLikesDAO {
      * @return cписок id фильмов
      */
     public List<Long> mostLikedFilms(int limit) {
-        String query = "SELECT film_id, COUNT(user_id) likes FROM film_likes GROUP BY film_id ORDER BY likes DESC LIMIT ?";
-        return jdbcTemplate.queryForList(query, long.class, limit);
+        //Сначала формируется список наиболее популярных фильмов очевидным образом (есть записи в таблице FILM_LIKES)
+        String query = "SELECT film_id FROM film_likes GROUP BY film_id ORDER BY COUNT(user_id) DESC LIMIT ?";
+        List<Long> naiveFilmList = jdbcTemplate.queryForList(query, long.class, limit);
+        //Если размера сформированного списка не хватает, тогда добавляем те, которых нет в таблице (т.е. 0 лайков)
+        if (limit > naiveFilmList.size()) {
+            //сколько не хватает до формирования списка
+            int numberToAdd = limit - naiveFilmList.size();
+
+            if (naiveFilmList.size() == 0) {
+                String queryForAnyFilms = "SELECT film_id FROM films LIMIT ?";
+                List<Long> additiveList = jdbcTemplate.queryForList(queryForAnyFilms, long.class, numberToAdd);
+                return additiveList;
+            }
+
+            StringBuilder idListBuilder = new StringBuilder();
+            for (Long filmId : naiveFilmList) {
+                idListBuilder.append(filmId + ",");
+            }
+            idListBuilder.deleteCharAt(idListBuilder.length() - 1);
+            String idList = idListBuilder.toString();
+
+            String queryForRandomNoLikeFilms = String.format("SELECT film_id FROM films WHERE film_id " +
+                    "NOT IN (%s) LIMIT %d", idList, numberToAdd);
+
+            List<Long> additiveFilmList = jdbcTemplate.queryForList(queryForRandomNoLikeFilms, long.class);
+            naiveFilmList.addAll(additiveFilmList);
+        }
+
+        return naiveFilmList;
     }
 
     public boolean addLike(long filmId, long userId) {

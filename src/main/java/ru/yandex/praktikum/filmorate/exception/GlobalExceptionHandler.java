@@ -24,7 +24,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exc.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = {NoSuchFilmException.class, NoSuchUserException.class})
+    @ExceptionHandler(value = {NoSuchFilmException.class, NoSuchUserException.class,
+                                NoSuchRatingException.class, NoSuchGenreException.class})
     public ResponseEntity<String> handleObjectMissingExceptions(RuntimeException exc) {
         log.warn(exc.getMessage());
         return new ResponseEntity<>(exc.getMessage(), HttpStatus.NOT_FOUND);
