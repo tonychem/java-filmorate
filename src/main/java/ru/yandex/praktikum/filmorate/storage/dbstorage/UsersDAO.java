@@ -45,6 +45,8 @@ public class UsersDAO implements UserStorage {
         } else {
             jdbcTemplate.update("INSERT INTO USERS(login, name, email, birthday) VALUES (?, ?, ?, ?)",
                     user.getLogin(), user.getName(), user.getEmail(), user.getBirthday());
+            long assignedId = jdbcTemplate.queryForObject("SELECT user_id FROM USERS WHERE login = ?", long.class, user.getLogin());
+            user.setId(assignedId);
             return user;
         }
     }

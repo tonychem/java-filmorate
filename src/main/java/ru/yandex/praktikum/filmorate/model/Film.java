@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.filmorate.model;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.Min;
@@ -21,6 +22,7 @@ public class Film {
     private String description;
 
     @NonNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private String releaseDate;
 
     @Min(value = 1)

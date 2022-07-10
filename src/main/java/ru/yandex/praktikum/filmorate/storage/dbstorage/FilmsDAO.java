@@ -1,7 +1,6 @@
 package ru.yandex.praktikum.filmorate.storage.dbstorage;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -10,7 +9,6 @@ import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -54,10 +52,15 @@ public class FilmsDAO implements FilmStorage {
             jdbcTemplate.update("INSERT INTO FILMS (name, description, releasedate, duration, rating_id) VALUES (?, ?, ?, ?, ?)",
                     film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getRating());
 
+            long assignedId = jdbcTemplate.queryForObject("SELECT film_id FROM FILMS WHERE name = ?", long.class,
+                    film.getName());
+
             //Список жанров вставляем в таблицу FILM_GENRES
             if (film.getGenres() != null) {
-                genresDAO.addFilmGenres(film.getId(), film.getGenres());
+                genresDAO.addFilmGenres(assignedId, film.getGenres());
             }
+            
+            film.setId(assignedId);
 
             return film;
         }

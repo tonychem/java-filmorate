@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.filmorate.model;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -24,6 +25,7 @@ public class User {
     private String name;
 
     @NonNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private String birthday;
 
 }
