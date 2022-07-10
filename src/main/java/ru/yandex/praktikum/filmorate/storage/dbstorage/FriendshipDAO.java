@@ -22,7 +22,7 @@ public class FriendshipDAO {
      * @return список id друзей пользователя
      */
     public List<Long> getAllFriendsForUser(long userId) {
-        String sqlSubquery = "SELECT userTwo FROM FRIENDSHIP WHERE userone_id = ? AND accepted = true";
+        String sqlSubquery = "SELECT usertwo_id FROM FRIENDSHIP WHERE userone_id = ? AND accepted = true";
         String sqlQuery = String.format("SELECT userone_id from FRIENDSHIP WHERE userone_id IN (%s) and accepted = true",
                 sqlSubquery);
 
@@ -30,12 +30,17 @@ public class FriendshipDAO {
     }
 
     public void makeFriendRequest(long fromUserOne, long toUserTwo) {
+        if (fromUserOne == toUserTwo) {
+            throw new RuntimeException(); //TODO: изменить
+        }
         // вносится запись, что userOne отправил запрос на дружбу к userTwo
         jdbcTemplate.update("INSERT INTO FRIENDSHIP(userone_id, usertwo_id, accepted) VALUES (?, ?, true)",
                 fromUserOne, toUserTwo);
         // симметрично вносится запись у userTwo
-        jdbcTemplate.update("INSERT INTO FRIENDSHIP(userone_id, usertwo_id, accepted) VALUES (?, ?, true)",
+        jdbcTemplate.update("INSERT INTO FRIENDSHIP(userone_id, usertwo_id, accepted) VALUES (?, ?, false)",
                 toUserTwo, fromUserOne);
+        //TODO: выбросить ошибку, если запрос или дружба уже существует
+        //TODO: нельзя стать самому себе другом
     }
 
     public void acceptFriendRequest(long senderUserId, long acceptingUserId) {

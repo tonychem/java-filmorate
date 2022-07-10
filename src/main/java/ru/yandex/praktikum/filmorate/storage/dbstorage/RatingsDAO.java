@@ -41,6 +41,7 @@ public class RatingsDAO {
         Map<Integer, String> ratingsMap = new LinkedHashMap<>();
 
         while (rowSet.next()) {
+            rowSet.next(); // TODO: пропустить заголовок
             Integer ratingId = rowSet.getInt(1);
             String ratingName = rowSet.getString(2);
             ratingsMap.put(ratingId, ratingName);

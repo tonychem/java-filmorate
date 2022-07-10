@@ -48,6 +48,7 @@ public class FilmsDAO implements FilmStorage {
         if (films().contains(film)) {
             throw new FilmAlreadyExistsException(String.format("Фильм %s уже существует", film.getName()));
         } else {
+            System.out.println(film);
             //Добавляем фильм в таблицу FILMS
             jdbcTemplate.update("INSERT INTO FILMS (name, description, releasedate, duration, rating_id) VALUES (?, ?, ?, ?, ?)",
                     film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getRating());
