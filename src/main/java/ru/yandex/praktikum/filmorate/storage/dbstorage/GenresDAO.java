@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.praktikum.filmorate.model.Genre;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -80,10 +81,10 @@ public class GenresDAO {
      * @param listOfGenres - список жанров фильма
      * @return true - если все значения были добавлены в таблицу
      */
-    public boolean addFilmGenres(long filmId, List<Integer> listOfGenres) {
+    public boolean addFilmGenres(long filmId, List<Genre> listOfGenres) {
         int successCount = 0;
-        for (Integer genreId : listOfGenres) {
-            successCount += jdbcTemplate.update("INSERT INTO FILM_GENRES(film_id, genre_id) VALUES (?, ?)", filmId, genreId);
+        for (Genre genre : listOfGenres) {
+            successCount += jdbcTemplate.update("INSERT INTO FILM_GENRES(film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
         }
         return successCount == listOfGenres.size();
     }

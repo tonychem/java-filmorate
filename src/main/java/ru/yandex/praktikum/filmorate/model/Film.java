@@ -30,8 +30,9 @@ public class Film {
 
     @EqualsAndHashCode.Exclude
     @Nullable
-    private List<Integer> genres;
+    private List<Genre> genres;
 
     @EqualsAndHashCode.Exclude
+    @NonNull
     private MPA mpa;
 }

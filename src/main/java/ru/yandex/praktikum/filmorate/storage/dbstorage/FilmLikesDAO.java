@@ -2,6 +2,7 @@ package ru.yandex.praktikum.filmorate.storage.dbstorage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -45,7 +46,11 @@ public class FilmLikesDAO {
     }
 
     public boolean checkKeyExists(long filmId, long userId) {
-        return jdbcTemplate.queryForRowSet("SELECT COUNT(*) WHERE film_id = ? AND user_id = ?",
-                filmId, userId).getInt(1) == 1;
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT COUNT(*) FROM film_likes WHERE film_id = ? AND user_id = ?",
+                filmId, userId);
+        if (rowSet.next()) {
+            return rowSet.getInt(1) == 1;
+        }
+        return false;
     }
 }

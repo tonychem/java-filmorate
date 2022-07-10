@@ -11,12 +11,13 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class MPA {
+public class Genre {
     private int id;
     private String name;
+
     @JsonCreator
-    public MPA(@JsonProperty("id") int id,
-               @JsonProperty("name") String name) {
+    public Genre(@JsonProperty("id") int id,
+                 @JsonProperty("name") String name) {
         this.id = id;
         this.name = name;
     }

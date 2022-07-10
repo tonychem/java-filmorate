@@ -2,10 +2,14 @@ package ru.yandex.praktikum.filmorate.storage.dbstorage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.praktikum.filmorate.model.MPA;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +28,11 @@ public class RatingsDAO {
      */
     public String name(int ratingId) {
         SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT name FROM ratings WHERE rating_id = ?", ratingId);
-        return rs.getString(1);
+        if (rs.next()) {
+            return rs.getString(1);
+        } else {
+            throw new RuntimeException(); //TODO: придумать что-нибудь получше
+        }
     }
 
     public String getRatingName(int ratingId) {
@@ -36,18 +44,16 @@ public class RatingsDAO {
         }
     }
 
-    public Map<Integer, String> listOfRatingsInTable() {
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM ratings ORDER BY rating_id");
-        Map<Integer, String> ratingsMap = new LinkedHashMap<>();
+    public List<MPA> listOfRatingsInTable() {
+        RowMapper<MPA> rmMPA = (rs, rowNum) -> {
+            int id = rs.getInt(1);
+            String name = rs.getString(2);
+            return new MPA(id, name);
+        };
 
-        while (rowSet.next()) {
-            rowSet.next(); // TODO: пропустить заголовок
-            Integer ratingId = rowSet.getInt(1);
-            String ratingName = rowSet.getString(2);
-            ratingsMap.put(ratingId, ratingName);
-        }
+        List<MPA> listOfMPA = jdbcTemplate.query("SELECT * FROM ratings ORDER BY rating_id", rmMPA);
 
-        return ratingsMap;
+        return listOfMPA.subList(1, listOfMPA.size());
     }
 
     /**

@@ -7,11 +7,13 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.praktikum.filmorate.exception.FilmAlreadyExistsException;
 import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.model.Film;
+import ru.yandex.praktikum.filmorate.model.Genre;
 import ru.yandex.praktikum.filmorate.model.MPA;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * DAO-класс для работы с таблицей FILMS
@@ -22,15 +24,17 @@ public class FilmsDAO implements FilmStorage {
     private JdbcTemplate jdbcTemplate;
     private GenresDAO genresDAO;
 
+    private RatingsDAO ratingsDAO;
+
     private final RowMapper<Film> filmRowMapper = (rs, row) -> {
         long filmId = rs.getLong(1);
         String filmName = rs.getString(2);
         String filmDescription = rs.getString(3);
         String filmReleaseDate = rs.getString(4);
         int filmDuration = rs.getInt(5);
-        List<Integer> filmGenres = genresDAO.listOfGenresForFilm(filmId);
+        List<Genre> filmGenres = genresDAO.listOfGenresForFilm(filmId).stream().map(x -> new Genre(x, genresDAO.getGenreName(x))).collect(Collectors.toList());
         int ratingId = rs.getInt(6);
-        return new Film(filmId, filmName, filmDescription, filmReleaseDate, filmDuration, filmGenres, new MPA(ratingId));
+        return new Film(filmId, filmName, filmDescription, filmReleaseDate, filmDuration, filmGenres, new MPA(ratingId, ratingsDAO.name(ratingId)));
     };
 
     @Override
@@ -80,7 +84,9 @@ public class FilmsDAO implements FilmStorage {
             jdbcTemplate.update("UPDATE FILMS SET name = ?, description = ?, releasedate = ?, duration = ?, rating_id = ?",
                     film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId());
             //обновить таблицу FILM_GENRES
-            genresDAO.addFilmGenres(film.getId(), film.getGenres());
+            if (film.getGenres() != null) {
+                genresDAO.addFilmGenres(film.getId(), film.getGenres());
+            }
             return film;
         } else {
             throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", id));
