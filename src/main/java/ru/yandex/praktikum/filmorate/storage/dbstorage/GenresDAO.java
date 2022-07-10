@@ -61,17 +61,16 @@ public class GenresDAO {
         return genresForAFilm;
     }
 
-    public Map<Integer, String> listOfGenresInTable() {
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM GENRES ORDER BY genre_id");
-        Map<Integer, String> genresMap = new LinkedHashMap<>();
+    public List<Genre> listOfGenresInTable() {
+        RowMapper<Genre> rmGenre = (rs, rowNum) -> {
+            int id = rs.getInt(1);
+            String name = rs.getString(2);
+            return new Genre(id, name);
+        };
 
-        while(rowSet.next()) {
-            Integer genreId = rowSet.getInt(1);
-            String genreName = rowSet.getString(2);
-            genresMap.put(genreId, genreName);
-        }
+        List<Genre> genreList = jdbcTemplate.query("SELECT * FROM GENRES ORDER BY genre_id", rmGenre);
 
-        return genresMap;
+        return genreList.subList(1, genreList.size());
     }
 
     /**

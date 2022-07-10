@@ -5,10 +5,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.praktikum.filmorate.model.Genre;
 import ru.yandex.praktikum.filmorate.storage.dbstorage.GenresDAO;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,7 +21,7 @@ public class GenresController {
     private final GenresDAO genresDAO;
 
     @GetMapping
-    public Map<Integer, String> genres() {
+    public List<Genre> genres() {
         return genresDAO.listOfGenresInTable();
     }
 

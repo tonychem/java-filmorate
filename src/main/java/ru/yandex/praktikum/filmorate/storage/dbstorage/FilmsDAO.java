@@ -81,8 +81,9 @@ public class FilmsDAO implements FilmStorage {
         long id = film.getId();
         if (filmById(id) != null) {
             //обновить таблицу FILMS
-            jdbcTemplate.update("UPDATE FILMS SET name = ?, description = ?, releasedate = ?, duration = ?, rating_id = ?",
-                    film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId());
+            jdbcTemplate.update("UPDATE FILMS SET name = ?, description = ?, releasedate = ?, duration = ?, rating_id = ? " +
+                            "WHERE film_id = ?",
+                    film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), id);
             //обновить таблицу FILM_GENRES
             if (film.getGenres() != null) {
                 genresDAO.addFilmGenres(film.getId(), film.getGenres());
