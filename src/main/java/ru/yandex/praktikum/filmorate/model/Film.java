@@ -33,5 +33,5 @@ public class Film {
     private List<Integer> genres;
 
     @EqualsAndHashCode.Exclude
-    private int rating;
+    private MPA mpa;
 }

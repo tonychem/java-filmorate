@@ -52,6 +52,7 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
         validator.validateRequestBody(film);
+        System.out.println(film);
         Film filmIdUpdated = filmStorage.addFilm(film);
         //TODO: mpa приходят в виде объектов с тестов, нужно сделать соответствующую модель
         log.info("Фильм с названием {} был добавлен", filmIdUpdated.getName());
