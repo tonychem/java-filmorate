@@ -13,6 +13,7 @@ import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +33,7 @@ public class FilmsDAO implements FilmStorage {
         String filmDescription = rs.getString(3);
         String filmReleaseDate = rs.getString(4);
         int filmDuration = rs.getInt(5);
-        List<Genre> filmGenres = genresDAO.listOfGenresForFilm(filmId).stream().map(x -> new Genre(x, genresDAO.getGenreName(x))).collect(Collectors.toList());
+        Set<Genre> filmGenres = genresDAO.listOfGenresForFilm(filmId).stream().map(x -> new Genre(x, genresDAO.getGenreName(x))).collect(Collectors.toSet());
         int ratingId = rs.getInt(6);
         return new Film(filmId, filmName, filmDescription, filmReleaseDate, filmDuration, filmGenres, new MPA(ratingId, ratingsDAO.name(ratingId)));
     };
@@ -86,9 +87,10 @@ public class FilmsDAO implements FilmStorage {
                     film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), id);
             //обновить таблицу FILM_GENRES
             if (film.getGenres() != null) {
+                genresDAO.deleteFilmFromFilmGenres(id);
                 genresDAO.addFilmGenres(film.getId(), film.getGenres());
             }
-            return film;
+            return filmById(id);
         } else {
             throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", id));
         }

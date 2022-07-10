@@ -7,10 +7,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.praktikum.filmorate.model.Genre;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * DAO-класс для работы с таблицей GENRES и соединительной таблицей FILM_GENRES
@@ -51,9 +48,10 @@ public class GenresDAO {
      * @param filmId - id фильма
      * @return Список id жанров для данного фильма
      */
-    public List<Integer> listOfGenresForFilm(long filmId) {
-        ArrayList<Integer> genresForAFilm = new ArrayList<>();
-        SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT genre_id FROM FILM_GENRES WHERE film_id = ?", filmId);
+    public Set<Integer> listOfGenresForFilm(long filmId) {
+        Set<Integer> genresForAFilm = new LinkedHashSet<>();
+        SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT genre_id FROM FILM_GENRES WHERE film_id = ? " +
+                "ORDER BY genre_id", filmId);
 
         while (rs.next()) {
             genresForAFilm.add(rs.getInt(1));
@@ -80,7 +78,7 @@ public class GenresDAO {
      * @param listOfGenres - список жанров фильма
      * @return true - если все значения были добавлены в таблицу
      */
-    public boolean addFilmGenres(long filmId, List<Genre> listOfGenres) {
+    public boolean addFilmGenres(long filmId, Set<Genre> listOfGenres) {
         int successCount = 0;
         for (Genre genre : listOfGenres) {
             successCount += jdbcTemplate.update("INSERT INTO FILM_GENRES(film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
@@ -97,5 +95,9 @@ public class GenresDAO {
 
     public boolean deleteGenre(int genreId) {
         return jdbcTemplate.update("DELETE FROM GENRES WHERE genre_id = ?", genreId) == 1;
+    }
+
+    public void deleteFilmFromFilmGenres(long filmId) {
+        jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", filmId);
     }
 }

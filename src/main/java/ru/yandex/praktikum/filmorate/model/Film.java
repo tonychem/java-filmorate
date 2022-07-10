@@ -7,6 +7,7 @@ import org.springframework.lang.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
@@ -30,7 +31,7 @@ public class Film {
 
     @EqualsAndHashCode.Exclude
     @Nullable
-    private List<Genre> genres;
+    private Set<Genre> genres;
 
     @EqualsAndHashCode.Exclude
     @NonNull
