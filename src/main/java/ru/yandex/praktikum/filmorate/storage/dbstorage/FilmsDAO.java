@@ -27,7 +27,7 @@ public class FilmsDAO implements FilmStorage {
         String filmDescription = rs.getString(3);
         String filmReleaseDate = rs.getString(4);
         int filmDuration = rs.getInt(5);
-        List<Integer> filmGenres = genresDAO.listOfGenres(filmId);
+        List<Integer> filmGenres = genresDAO.listOfGenresForFilm(filmId);
         int ratingId = rs.getInt(6);
         return new Film(filmId, filmName, filmDescription, filmReleaseDate, filmDuration, filmGenres, ratingId);
     };
@@ -59,7 +59,7 @@ public class FilmsDAO implements FilmStorage {
             if (film.getGenres() != null) {
                 genresDAO.addFilmGenres(assignedId, film.getGenres());
             }
-            
+
             film.setId(assignedId);
 
             return film;

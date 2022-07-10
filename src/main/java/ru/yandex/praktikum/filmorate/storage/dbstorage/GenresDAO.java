@@ -1,13 +1,15 @@
 package ru.yandex.praktikum.filmorate.storage.dbstorage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO-класс для работы с таблицей GENRES и соединительной таблицей FILM_GENRES
@@ -25,7 +27,11 @@ public class GenresDAO {
      */
     public String getGenreName(int genreId) {
         SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT name FROM GENRES WHERE genre_id = ?", genreId);
-        return rs.getString(1);
+        if (rs.next()) {
+            return rs.getString(1);
+        } else {
+            throw new RuntimeException(); //TODO: new exception добавить везде!
+        }
     }
 
     /**
@@ -44,7 +50,7 @@ public class GenresDAO {
      * @param filmId - id фильма
      * @return Список id жанров для данного фильма
      */
-    public List<Integer> listOfGenres(long filmId) {
+    public List<Integer> listOfGenresForFilm(long filmId) {
         ArrayList<Integer> genresForAFilm = new ArrayList<>();
         SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT genre_id FROM FILM_GENRES WHERE film_id = ?", filmId);
 
@@ -52,6 +58,19 @@ public class GenresDAO {
             genresForAFilm.add(rs.getInt(1));
         }
         return genresForAFilm;
+    }
+
+    public Map<Integer, String> listOfGenresInTable() {
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM GENRES ORDER BY genre_id");
+        Map<Integer, String> genresMap = new LinkedHashMap<>();
+
+        while(rowSet.next()) {
+            Integer genreId = rowSet.getInt(1);
+            String genreName = rowSet.getString(2);
+            genresMap.put(genreId, genreName);
+        }
+
+        return genresMap;
     }
 
     /**
