@@ -15,23 +15,6 @@ import java.util.List;
 public class FilmLikesDAO {
     private final JdbcTemplate jdbcTemplate;
 
-    /**
-     * Возвращает список id пользователей, которые лайкнули фильм
-     *
-     * @param filmId - id фильма
-     * @return список id пользователей
-     */
-    public List<Long> userLikesByFilm(long filmId) {
-        return jdbcTemplate.queryForList("SELECT user_id FROM film_likes WHERE film_id = ?", long.class,
-                filmId);
-    }
-
-    /**
-     * Возвращает список из id наиболее популярных фильмов в порядке убывания
-     *
-     * @param limit - количество фильмов в списке
-     * @return cписок id фильмов
-     */
     public List<Long> mostLikedFilms(int limit) {
         //Сначала формируется список наиболее популярных фильмов очевидным образом (есть записи в таблице FILM_LIKES)
         String query = "SELECT film_id FROM film_likes GROUP BY film_id ORDER BY COUNT(user_id) DESC LIMIT ?";
@@ -53,6 +36,7 @@ public class FilmLikesDAO {
             }
             idListBuilder.deleteCharAt(idListBuilder.length() - 1);
             String idList = idListBuilder.toString();
+            //TODO пересмотреть эту часть
 
             String queryForRandomNoLikeFilms = String.format("SELECT film_id FROM films WHERE film_id " +
                     "NOT IN (%s) LIMIT %d", idList, numberToAdd);

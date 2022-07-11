@@ -40,14 +40,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<User> friendList(long userId) {
-        List<Long> userIds = friendshipDAO.getAllFriendsForUser(userId);
+        List<Long> userIds = friendshipDAO.friendsForUser(userId);
         return userIds.stream().map(userStorage::userById).collect(Collectors.toSet());
     }
 
     @Override
     public Set<User> mutualFriendList(long firstUser, long secondUser) {
-        List<Long> firstUserFriends = friendshipDAO.getAllFriendsForUser(firstUser);
-        List<Long> secondUserFriends = friendshipDAO.getAllFriendsForUser(secondUser);
+        List<Long> firstUserFriends = friendshipDAO.friendsForUser(firstUser);
+        List<Long> secondUserFriends = friendshipDAO.friendsForUser(secondUser);
 
         return firstUserFriends.stream()
                 .filter(secondUserFriends::contains)

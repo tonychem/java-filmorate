@@ -26,12 +26,7 @@ public class RatingsController {
     }
 
     @GetMapping(value = "/{id}")
-    public Map<String, Object> genreRatingById(@PathVariable(name = "id") int id) {
-        String name = ratingsDAO.getRatingName(id);
-        HashMap<String, Object> map = new LinkedHashMap<>();
-        map.put("id", id);
-        map.put("name", name);
-        return map;
-        //TODO: лучше через объекты
+    public MPA genreRatingById(@PathVariable(name = "id") int id) {
+        return ratingsDAO.rating(id);
     }
 }

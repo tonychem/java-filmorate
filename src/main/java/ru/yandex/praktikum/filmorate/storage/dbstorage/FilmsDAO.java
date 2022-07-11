@@ -14,7 +14,6 @@ import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * DAO-класс для работы с таблицей FILMS
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 public class FilmsDAO implements FilmStorage {
     private JdbcTemplate jdbcTemplate;
     private GenresDAO genresDAO;
-
     private RatingsDAO ratingsDAO;
 
     private final RowMapper<Film> filmRowMapper = (rs, row) -> {
@@ -33,9 +31,10 @@ public class FilmsDAO implements FilmStorage {
         String filmDescription = rs.getString(3);
         String filmReleaseDate = rs.getString(4);
         int filmDuration = rs.getInt(5);
-        Set<Genre> filmGenres = genresDAO.listOfGenresForFilm(filmId).stream().map(x -> new Genre(x, genresDAO.getGenreName(x))).collect(Collectors.toSet());
+        Set<Genre> filmGenres = genresDAO.setOfGenresForFilm(filmId);
         int ratingId = rs.getInt(6);
-        return new Film(filmId, filmName, filmDescription, filmReleaseDate, filmDuration, filmGenres, new MPA(ratingId, ratingsDAO.name(ratingId)));
+        return new Film(filmId, filmName, filmDescription, filmReleaseDate,
+                filmDuration, filmGenres, ratingsDAO.rating(ratingId));
     };
 
     @Override
@@ -89,6 +88,7 @@ public class FilmsDAO implements FilmStorage {
             if (film.getGenres() != null) {
                 genresDAO.deleteFilmFromFilmGenres(id);
                 genresDAO.addFilmGenres(film.getId(), film.getGenres());
+                //TODO: обновить, а не удалить и вставить))
             }
             return filmById(id);
         } else {

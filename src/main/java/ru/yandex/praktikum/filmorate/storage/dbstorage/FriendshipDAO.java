@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,21 +16,26 @@ import java.util.List;
 public class FriendshipDAO {
     private final JdbcTemplate jdbcTemplate;
 
-    /**
-     * Находит всех друзей пользователя с id userId
-     *
-     * @param userId - id пользователя, чьих друзей ищем
-     * @return список id друзей пользователя
-     */
-    public List<Long> getAllFriendsForUser(long userId) {
+    private final UsersDAO usersDAO;
+
+    public List<Long> friendsForUser(long userId) {
         String sqlQuery = "SELECT usertwo_id FROM friendship WHERE userone_id = ? AND accepted = true";
-        return jdbcTemplate.queryForList(sqlQuery, long.class, userId);
+        List<Long> friendsIds = new ArrayList<>();
+
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlQuery, userId);
+        while(rs.next()) {
+            friendsIds.add(rs.getLong(1));
+        }
+
+        return friendsIds;
     }
 
     public void makeFriendRequest(long fromUserOne, long toUserTwo) {
         if (fromUserOne == toUserTwo) {
-            throw new RuntimeException(); //TODO: изменить
+            throw new IllegalStateException("Нельзя отправить запрос на дружбу самому себе");
         }
+
+//        if (user)
 
         //TODO: проверить, что пользователи существуют
         // вносится запись, что userOne отправил запрос на дружбу к userTwo
@@ -39,7 +45,6 @@ public class FriendshipDAO {
         jdbcTemplate.update("INSERT INTO FRIENDSHIP(userone_id, usertwo_id, accepted) VALUES (?, ?, false)",
                 toUserTwo, fromUserOne);
         //TODO: выбросить ошибку, если запрос или дружба уже существует
-        //TODO: нельзя стать самому себе другом
     }
 
     public void acceptFriendRequest(long senderUserId, long acceptingUserId) {

@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.praktikum.filmorate.model.Genre;
 import ru.yandex.praktikum.filmorate.storage.dbstorage.GenresDAO;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/genres")
@@ -26,14 +23,8 @@ public class GenresController {
     }
 
     @GetMapping(value = "/{id}")
-    public Map<String, Object> genreById(@PathVariable(name = "id") int id) {
-        String name = genresDAO.getGenreName(id);
-        HashMap<String, Object> map = new LinkedHashMap<>();
-        map.put("id", id);
-        map.put("name", name);
-        return map;
-        //TODO: лучше через объекты
+    public Genre genreById(@PathVariable(name = "id") int id) {
+        return genresDAO.genreById(id);
     }
 
-    //TODO: привести все к id-шникам, либо к типам Genre?
 }
