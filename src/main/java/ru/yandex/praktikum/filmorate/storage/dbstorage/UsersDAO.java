@@ -94,4 +94,9 @@ public class UsersDAO implements UserStorage {
 
         return count == 1;
     }
+
+    public boolean checkUserExists(long userId) {
+        User u = userById(userId);
+        return u != null;
+    }
 }

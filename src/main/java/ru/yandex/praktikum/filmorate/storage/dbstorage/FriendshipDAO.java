@@ -23,7 +23,7 @@ public class FriendshipDAO {
         List<Long> friendsIds = new ArrayList<>();
 
         SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlQuery, userId);
-        while(rs.next()) {
+        while (rs.next()) {
             friendsIds.add(rs.getLong(1));
         }
 
@@ -31,20 +31,19 @@ public class FriendshipDAO {
     }
 
     public void makeFriendRequest(long fromUserOne, long toUserTwo) {
+        // Проверки на идентичность и наличие пользователя в базе
         if (fromUserOne == toUserTwo) {
             throw new IllegalStateException("Нельзя отправить запрос на дружбу самому себе");
         }
+        usersDAO.checkUserExists(fromUserOne);
+        usersDAO.checkUserExists(toUserTwo);
 
-//        if (user)
-
-        //TODO: проверить, что пользователи существуют
         // вносится запись, что userOne отправил запрос на дружбу к userTwo
         jdbcTemplate.update("INSERT INTO FRIENDSHIP(userone_id, usertwo_id, accepted) VALUES (?, ?, true)",
                 fromUserOne, toUserTwo);
         // симметрично вносится запись у userTwo
         jdbcTemplate.update("INSERT INTO FRIENDSHIP(userone_id, usertwo_id, accepted) VALUES (?, ?, false)",
                 toUserTwo, fromUserOne);
-        //TODO: выбросить ошибку, если запрос или дружба уже существует
     }
 
     public void acceptFriendRequest(long senderUserId, long acceptingUserId) {
