@@ -5,8 +5,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.praktikum.filmorate.model.Film;
+import ru.yandex.praktikum.filmorate.model.MPA;
 import ru.yandex.praktikum.filmorate.model.User;
 import ru.yandex.praktikum.filmorate.validation.Validator;
+
+import java.util.HashSet;
 
 public class ValidationTests {
 
@@ -37,8 +40,8 @@ public class ValidationTests {
         userLoginWithSpaces = new User( 5, "team@yandex.ru", "login  double spaced", "name", "1995-05-30");
         birthdayInFuture = new User( 6, "team@yandex.ru", "login", "name", "2032-05-30");
 
-        normalFilm = new Film(1, "nisi eiusmod", "adipisicing", "1967-03-25", 100);
-        filmWithEmptyName = new Film(2, "", "adipisicing", "1967-03-25", 100);
+        normalFilm = new Film(1, "nisi eiusmod", "adipisicing", "1967-03-25", 100, new HashSet<>(), new MPA(1, "whatever"));
+        filmWithEmptyName = new Film(2, "", "adipisicing", "1967-03-25", 100, new HashSet<>(), new MPA(1, "whatever"));
         filmWithDescriptionCharactersExceeding200 =
                 new Film(3, "nisi eiusmod", "At an abandoned hotel, a police squad corners Trinity, " +
                         "who overpowers them with superhuman abilities. She flees, pursued by the police and a group of " +
@@ -53,11 +56,11 @@ public class ValidationTests {
                         "When Neo refuses, the Agents fuse his mouth shut and implant a robotic \"bug\" in his stomach. " +
                         "Neo wakes up from what he believes to be a nightmare. " +
                         "Soon after, Neo is taken by Trinity to meet Morpheus, and she removes the bug from Neo, indicating " +
-                        "that the \"nightmare\" he experienced was apparently real.", "1967-03-25", 100);
+                        "that the \"nightmare\" he experienced was apparently real.", "1967-03-25", 100, new HashSet<>(), new MPA(1, "whatever"));
         filmReleasedEarlierThanFilmographyEra = new Film(3, "nisi eiusmod", "adipisicing",
-                "1895-12-27", 100);
+                "1895-12-27", 100, new HashSet<>(), new MPA(1, "whatever"));
         filmWithDurationZero = new Film(4, "nisi eiusmod", "adipisicing",
-                "1995-12-27", 0);
+                "1995-12-27", 0, new HashSet<>(), new MPA(1, "whatever"));
     }
 
     @DisplayName("Valid user")
