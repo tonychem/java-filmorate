@@ -86,9 +86,7 @@ public class FilmsDAO implements FilmStorage {
                     film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), id);
             //обновить таблицу FILM_GENRES
             if (film.getGenres() != null) {
-                genresDAO.deleteFilmFromFilmGenres(id);
-                genresDAO.addFilmGenres(film.getId(), film.getGenres());
-                //TODO: обновить, а не удалить и вставить))
+                genresDAO.updateGenresOfFilm(film.getId(), film.getGenres());
             }
             return filmById(id);
         } else {

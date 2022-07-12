@@ -52,12 +52,17 @@ public class GenresDAO {
         return genreList;
     }
 
-    public boolean addFilmGenres(long filmId, Set<Genre> listOfGenres) {
-        int successCount = 0;
+    public void addFilmGenres(long filmId, Set<Genre> listOfGenres) {
         for (Genre genre : listOfGenres) {
-            successCount += jdbcTemplate.update("INSERT INTO FILM_GENRES(film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
+            jdbcTemplate.update("INSERT INTO FILM_GENRES(film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
         }
-        return successCount == listOfGenres.size();
+    }
+
+    public void updateGenresOfFilm(long filmId, Set<Genre> filmGenres) {
+        jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", filmId);
+        for (Genre genre : filmGenres) {
+            jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
+        }
     }
 
     public void deleteFilmFromFilmGenres(long filmId) {

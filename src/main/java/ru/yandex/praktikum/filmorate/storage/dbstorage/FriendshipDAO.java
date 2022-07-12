@@ -16,8 +16,6 @@ import java.util.List;
 public class FriendshipDAO {
     private final JdbcTemplate jdbcTemplate;
 
-    private final UsersDAO usersDAO;
-
     public List<Long> friendsForUser(long userId) {
         String sqlQuery = "SELECT usertwo_id FROM friendship WHERE userone_id = ? AND accepted = true";
         List<Long> friendsIds = new ArrayList<>();
@@ -31,13 +29,9 @@ public class FriendshipDAO {
     }
 
     public void makeFriendRequest(long fromUserOne, long toUserTwo) {
-        // Проверки на идентичность и наличие пользователя в базе
         if (fromUserOne == toUserTwo) {
             throw new IllegalStateException("Нельзя отправить запрос на дружбу самому себе");
         }
-        usersDAO.checkUserExists(fromUserOne);
-        usersDAO.checkUserExists(toUserTwo);
-
         // вносится запись, что userOne отправил запрос на дружбу к userTwo
         jdbcTemplate.update("INSERT INTO FRIENDSHIP(userone_id, usertwo_id, accepted) VALUES (?, ?, true)",
                 fromUserOne, toUserTwo);

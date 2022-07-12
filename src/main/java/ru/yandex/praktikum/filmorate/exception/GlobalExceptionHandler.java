@@ -1,5 +1,6 @@
 package ru.yandex.praktikum.filmorate.exception;
 
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,4 +49,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exc.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(value = ValueInstantiationException.class)
+    public ResponseEntity<String> handleValueInstantiationExceptions(ValueInstantiationException exc) {
+        log.warn(exc.getMessage());
+        return new ResponseEntity<>(exc.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

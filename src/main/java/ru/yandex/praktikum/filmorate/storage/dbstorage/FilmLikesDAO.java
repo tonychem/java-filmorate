@@ -24,19 +24,21 @@ public class FilmLikesDAO {
             //сколько не хватает до формирования списка
             int numberToAdd = limit - naiveFilmList.size();
 
+            //если в базе нет фильмов с лайками, то выводим любые
             if (naiveFilmList.size() == 0) {
                 String queryForAnyFilms = "SELECT film_id FROM films LIMIT ?";
                 List<Long> additiveList = jdbcTemplate.queryForList(queryForAnyFilms, long.class, numberToAdd);
                 return additiveList;
             }
 
-            StringBuilder idListBuilder = new StringBuilder();
-            for (Long filmId : naiveFilmList) {
-                idListBuilder.append(filmId + ",");
+            //иначе формируем строковое представление id-шников фильмов вида (id1, id2, id3, ..., idN), которые
+            //присутствуют в таблице FILM_LIKES, и делаем запрос на произвольные фильмы, не принадлежащие этому диапазону
+
+            String[] filmIdsAsStringArray = new String[naiveFilmList.size()];
+            for (int i = 0; i < naiveFilmList.size(); i++) {
+                filmIdsAsStringArray[i] = String.valueOf(naiveFilmList.get(i));
             }
-            idListBuilder.deleteCharAt(idListBuilder.length() - 1);
-            String idList = idListBuilder.toString();
-            //TODO пересмотреть эту часть
+            String idList = String.join(",", filmIdsAsStringArray);
 
             String queryForRandomNoLikeFilms = String.format("SELECT film_id FROM films WHERE film_id " +
                     "NOT IN (%s) LIMIT %d", idList, numberToAdd);
@@ -48,12 +50,12 @@ public class FilmLikesDAO {
         return naiveFilmList;
     }
 
-    public boolean addLike(long filmId, long userId) {
-        return jdbcTemplate.update("INSERT INTO film_likes VALUES (?, ?)", filmId, userId) == 1;
+    public void addLike(long filmId, long userId) {
+        jdbcTemplate.update("INSERT INTO film_likes VALUES (?, ?)", filmId, userId);
     }
 
-    public boolean removeLike(long filmId, long userId) {
-        return jdbcTemplate.update("DELETE FROM film_likes WHERE film_id = ? AND user_id = ?", filmId, userId) == 1;
+    public void removeLike(long filmId, long userId) {
+        jdbcTemplate.update("DELETE FROM film_likes WHERE film_id = ? AND user_id = ?", filmId, userId);
     }
 
     public boolean checkKeyExists(long filmId, long userId) {
