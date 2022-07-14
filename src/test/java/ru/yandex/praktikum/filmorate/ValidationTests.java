@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.yandex.praktikum.filmorate.exception.ValidationException;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.model.MPA;
 import ru.yandex.praktikum.filmorate.model.User;
@@ -78,54 +79,54 @@ public class ValidationTests {
     @DisplayName("User with empty email")
     @Test
     public void checkUserWithEmptyEmail() {
-        Assertions.assertFalse(validator.validateRequestBody(userWithEmptyEmail));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(userWithEmptyEmail));
     }
 
     @DisplayName("User with email without @")
     @Test
     public void checkUserWithEmailWithoutAt() {
-        Assertions.assertFalse(validator.validateRequestBody(userWithEmailWithoutAt));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(userWithEmailWithoutAt));
     }
 
     @DisplayName("User with empty login")
     @Test
     public void checkUserWithEmptyLogin() {
-        Assertions.assertFalse(validator.validateRequestBody(userWithEmptyLogin));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(userWithEmptyLogin));
     }
 
     @DisplayName("User login with spaces")
     @Test
     public void checkUserLoginWithSpaces() {
-        Assertions.assertFalse(validator.validateRequestBody(userLoginWithSpaces));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(userLoginWithSpaces));
     }
 
     @DisplayName("User birthday in future")
     @Test
     public void checkUserBirthdayInFuture() {
-        Assertions.assertFalse(validator.validateRequestBody(birthdayInFuture));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(birthdayInFuture));
     }
 
     @DisplayName("Film with empty name")
     @Test
     public void checkFilmWithEmptyName() {
-        Assertions.assertFalse(validator.validateRequestBody(filmWithEmptyName));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(filmWithEmptyName));
     }
 
     @DisplayName("Film description exceeding 200 characters")
     @Test
     public void checkFilmWithDescriptionCharactersExceeding200() {
-        Assertions.assertFalse(validator.validateRequestBody(filmWithDescriptionCharactersExceeding200));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(filmWithDescriptionCharactersExceeding200));
     }
 
     @DisplayName("Film released earlier than filmography era")
     @Test
     public void checkFilmReleasedEarlierThanFilmographyEr() {
-        Assertions.assertFalse(validator.validateRequestBody(filmReleasedEarlierThanFilmographyEra));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(filmReleasedEarlierThanFilmographyEra));
     }
 
     @DisplayName("Film with 0 duration")
     @Test
     public void checkFilmWithDurationZero() {
-        Assertions.assertFalse(validator.validateRequestBody(filmWithDurationZero));
+        Assertions.assertThrows(ValidationException.class, () -> validator.validateRequestBody(filmWithDurationZero));
     }
 }
