@@ -23,7 +23,7 @@ public class GenresController {
     }
 
     @GetMapping(value = "/{id}")
-    public Genre genreById(@PathVariable(name = "id") int id) {
+    public Genre genreById(@PathVariable int id) {
         return genresDAO.genreById(id);
     }
 

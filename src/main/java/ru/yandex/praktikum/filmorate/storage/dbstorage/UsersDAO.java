@@ -38,7 +38,7 @@ public class UsersDAO implements UserStorage {
         User user;
         try {
             user = jdbcTemplate.queryForObject("SELECT * FROM USERS WHERE user_id = ?", userRowMapper, id);
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException exc) {
             throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", id));
         }
         return user;
@@ -64,10 +64,11 @@ public class UsersDAO implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        if (checkUserExists(user)) {
+        long userId = user.getId();
+        if (checkUserExists(userId)) {
             jdbcTemplate.update("UPDATE USERS SET login = ?, name = ?, email = ?, birthday = ? WHERE user_id = ?",
-                    user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), user.getId());
-            return user;
+                    user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), userId);
+            return userById(userId);
         } else {
             throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", user.getId()));
         }
@@ -96,7 +97,6 @@ public class UsersDAO implements UserStorage {
     }
 
     public boolean checkUserExists(long userId) {
-        User u = userById(userId);
-        return u != null;
+        return userById(userId) != null;
     }
 }

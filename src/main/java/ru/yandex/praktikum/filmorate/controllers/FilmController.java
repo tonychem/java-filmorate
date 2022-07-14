@@ -52,7 +52,6 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
         validator.validateRequestBody(film);
-        System.out.println(film);
         Film filmIdUpdated = filmStorage.addFilm(film);
         log.info("Фильм с названием {} был добавлен", filmIdUpdated.getName());
         return filmIdUpdated;

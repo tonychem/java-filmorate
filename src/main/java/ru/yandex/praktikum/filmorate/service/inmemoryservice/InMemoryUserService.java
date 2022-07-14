@@ -82,9 +82,8 @@ public class InMemoryUserService implements UserService {
     }
 
     private void checkUserExists(long userId) {
-        if (userStorage.userById(userId) == null) {
-            throw new NoSuchUserException(String.format("Пользователя с id = %d не существует", userId));
-        }
+        User user = Optional.of(userStorage.userById(userId)).orElseThrow(() ->
+                new NoSuchUserException(String.format("Пользователя с id = %d не существует", userId)));
     }
 
     private void checkUserIdentity(long firstUser, long secondUser) {

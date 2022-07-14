@@ -40,8 +40,9 @@ public class FilmLikesDAO {
             }
             String idList = String.join(",", filmIdsAsStringArray);
 
-            String queryForRandomNoLikeFilms = String.format("SELECT film_id FROM films WHERE film_id " +
-                    "NOT IN (%s) LIMIT %d", idList, numberToAdd);
+            String queryForRandomNoLikeFilms = String.format("""
+                    SELECT film_id FROM films 
+                    WHERE film_id NOT IN (%s) LIMIT %d""", idList, numberToAdd);
 
             List<Long> additiveFilmList = jdbcTemplate.queryForList(queryForRandomNoLikeFilms, long.class);
             naiveFilmList.addAll(additiveFilmList);
@@ -61,9 +62,6 @@ public class FilmLikesDAO {
     public boolean checkKeyExists(long filmId, long userId) {
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT COUNT(*) FROM film_likes WHERE film_id = ? AND user_id = ?",
                 filmId, userId);
-        if (rowSet.next()) {
-            return rowSet.getInt(1) == 1;
-        }
-        return false;
+        return rowSet.next();
     }
 }

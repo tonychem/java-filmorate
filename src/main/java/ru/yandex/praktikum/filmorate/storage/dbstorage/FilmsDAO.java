@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.filmorate.storage.dbstorage;
 
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -8,11 +9,9 @@ import ru.yandex.praktikum.filmorate.exception.FilmAlreadyExistsException;
 import ru.yandex.praktikum.filmorate.exception.NoSuchFilmException;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.model.Genre;
-import ru.yandex.praktikum.filmorate.model.MPA;
 import ru.yandex.praktikum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -39,8 +38,13 @@ public class FilmsDAO implements FilmStorage {
 
     @Override
     public Film filmById(long id) {
-        List<Film> filmList = jdbcTemplate.query("SELECT * FROM FILMS WHERE film_id = ?", filmRowMapper, id);
-        return filmList.isEmpty() ? null : filmList.get(0);
+        Film film;
+        try {
+            film = jdbcTemplate.queryForObject("SELECT * FROM FILMS WHERE film_id = ?", filmRowMapper, id);
+        } catch (EmptyResultDataAccessException exc) {
+            throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", id));
+        }
+        return film;
     }
 
     @Override
@@ -79,7 +83,7 @@ public class FilmsDAO implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         long id = film.getId();
-        if (filmById(id) != null) {
+        if (checkFilmExists(id)) {
             //обновить таблицу FILMS
             jdbcTemplate.update("UPDATE FILMS SET name = ?, description = ?, releasedate = ?, duration = ?, rating_id = ? " +
                             "WHERE film_id = ?",
@@ -92,5 +96,9 @@ public class FilmsDAO implements FilmStorage {
         } else {
             throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", id));
         }
+    }
+
+    public boolean checkFilmExists(long filmId) {
+        return filmById(filmId) != null;
     }
 }

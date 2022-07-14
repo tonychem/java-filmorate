@@ -26,7 +26,7 @@ public class RatingsController {
     }
 
     @GetMapping(value = "/{id}")
-    public MPA genreRatingById(@PathVariable(name = "id") int id) {
+    public MPA genreRatingById(@PathVariable int id) {
         return ratingsDAO.rating(id);
     }
 }

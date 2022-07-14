@@ -63,9 +63,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     private void checkFilm(long filmId) {
-        Film film = filmStorage.filmById(filmId);
-        if (film == null) {
-            throw new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", filmId));
-        }
+        Film film = Optional.of(filmStorage.filmById(filmId)).orElseThrow(() ->
+                new NoSuchFilmException(String.format("Фильм с id = %d отсутствует", filmId)));
     }
 }
