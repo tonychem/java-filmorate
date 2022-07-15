@@ -1,13 +1,15 @@
 package ru.yandex.praktikum.filmorate;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.yandex.praktikum.filmorate.model.Film;
 import ru.yandex.praktikum.filmorate.model.MPA;
 import ru.yandex.praktikum.filmorate.model.User;
@@ -21,8 +23,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureTestDatabase
+@TestPropertySource("/application-test.properties")
+@Sql(scripts = {"/schema-test.sql", "/data-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {"/droptables-test.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class FilmoRateApplicationTests {
 
     private final UserStorage userStorage;
@@ -54,12 +59,6 @@ class FilmoRateApplicationTests {
         user2 = new User(2, "some_email@ya.ru", "login1", "user1", "1950-01-01");
         film1 = new Film(1, "testFilm", "<>", "1995-06-30", 50, new HashSet<>(), new MPA(1, "someMpa"));
         updateForFilm1 = new Film(1, "update", "<>", "1995-06-30", 50, new HashSet<>(), new MPA(1, "someMpa"));
-    }
-
-    @BeforeEach
-    public void cleanUp() {
-        jdbcTemplate.update("DELETE FROM users");
-        jdbcTemplate.update("DELETE FROM films");
     }
 
     @Test
