@@ -1,7 +1,7 @@
 package ru.yandex.praktikum.filmorate.controllers;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.praktikum.filmorate.model.Film;
@@ -17,11 +17,18 @@ import java.util.List;
 @RequestMapping(value = "/films")
 @Slf4j
 @Validated
-@AllArgsConstructor
 public class FilmController {
     private final Validator validator;
     private final FilmService filmService;
     private final FilmStorage filmStorage;
+
+    public FilmController(Validator validator,
+                          @Qualifier(value = "FilmServiceDB") FilmService filmService,
+                          @Qualifier(value = "FilmDBStorage") FilmStorage filmStorage) {
+        this.validator = validator;
+        this.filmService = filmService;
+        this.filmStorage = filmStorage;
+    }
 
     @GetMapping
     public Collection<Film> getFilms() {

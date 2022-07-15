@@ -1,7 +1,7 @@
 package ru.yandex.praktikum.filmorate.controllers;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.praktikum.filmorate.model.User;
@@ -17,11 +17,18 @@ import java.util.Set;
 @Slf4j
 @Validated
 @RequestMapping(value = "/users")
-@AllArgsConstructor
 public class UserController {
     private final Validator validator;
     private final UserStorage userStorage;
     private final UserService userService;
+
+    public UserController(Validator validator,
+                          @Qualifier(value = "UserDBStorage") UserStorage userStorage,
+                          @Qualifier(value = "UserServiceDB") UserService userService) {
+        this.validator = validator;
+        this.userStorage = userStorage;
+        this.userService = userService;
+    }
 
     @GetMapping
     public Collection<User> getUsers() {
