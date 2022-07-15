@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,8 +19,6 @@ import java.util.HashSet;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -31,17 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FilmoRateApplicationTests {
 
     private final UserStorage userStorage;
-
-    private final JdbcTemplate jdbcTemplate;
-
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmoRateApplicationTests(@Qualifier(value = "UserDBStorage") UserStorage userStorage,
-                                     JdbcTemplate jdbcTemplate,
-                                     @Qualifier(value = "FilmDBStorage") FilmStorage filmStorage) {
+    public FilmoRateApplicationTests(@Qualifier(value = "UserDBStorage") UserStorage userStorage, @Qualifier(value = "FilmDBStorage") FilmStorage filmStorage) {
         this.userStorage = userStorage;
-        this.jdbcTemplate = jdbcTemplate;
         this.filmStorage = filmStorage;
     }
 
@@ -64,60 +55,39 @@ class FilmoRateApplicationTests {
     @Test
     public void testFindUserById() {
 
-        long id = userStorage.addUser(user1).getId();
+        userStorage.addUser(user1);
 
-        Optional<User> userOptional = Optional.of(userStorage.userById(id));
+        Optional<User> userOptional = Optional.of(userStorage.userById(1));
 
-        assertThat(userOptional)
-                .isPresent()
-                .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", id)
-                );
+        assertThat(userOptional).isPresent().hasValueSatisfying(user -> assertThat(user).hasFieldOrPropertyWithValue("id", 1l));
     }
 
     @Test
     public void testUpdateUser() {
-        long idInitial = userStorage.addUser(user1).getId();
-        long idAfterUpdate = userStorage.updateUser(user1Update).getId();
+        userStorage.addUser(user1);
+        userStorage.updateUser(user1Update);
+        Optional<User> userOptional = Optional.of(userStorage.userById(1));
 
-        Optional<User> userOptional = Optional.of(userStorage.userById(idAfterUpdate));
-
-        assertThat(userOptional)
-                .isPresent()
-                .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("email", "mewEmail@ya.ru")
-                );
-
-        assertTrue(idInitial == idAfterUpdate);
+        assertThat(userOptional).isPresent().hasValueSatisfying(user -> assertThat(user).hasFieldOrPropertyWithValue("email", "mewEmail@ya.ru"));
     }
 
     @Test
     public void testFindFilmById() {
-        long id = filmStorage.addFilm(film1).getId();
+        filmStorage.addFilm(film1);
 
-        Optional<Film> filmOptional = Optional.of(filmStorage.filmById(id));
+        Optional<Film> filmOptional = Optional.of(filmStorage.filmById(1l));
 
-        assertThat(filmOptional)
-                .isPresent()
-                .hasValueSatisfying(film ->
-                        assertThat(film).hasFieldOrPropertyWithValue("id", id)
-                );
+        assertThat(filmOptional).isPresent().hasValueSatisfying(film -> assertThat(film).hasFieldOrPropertyWithValue("id", 1l));
     }
 
     @Test
     public void testUpdateFilm() {
-        long idInitial = filmStorage.addFilm(film1).getId();
-        long idAfterUpdate = filmStorage.updateFilm(updateForFilm1).getId();
+        filmStorage.addFilm(film1);
+        filmStorage.updateFilm(updateForFilm1);
 
-        Optional<Film> filmOptional = Optional.of(filmStorage.filmById(idAfterUpdate));
+        Optional<Film> filmOptional = Optional.of(filmStorage.filmById(1));
 
-        assertThat(filmOptional)
-                .isPresent()
-                .hasValueSatisfying(film ->
-                        assertThat(film).hasFieldOrPropertyWithValue("name", "update")
-                );
-
-        assertEquals(idAfterUpdate, idInitial);
+        assertThat(filmOptional).isPresent().hasValueSatisfying(film -> assertThat(film).hasFieldOrPropertyWithValue("name", "update"));
     }
 
 }
